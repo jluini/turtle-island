@@ -11,6 +11,8 @@ namespace TurtleIsland {
 	public class Hooks {
 		public Camera mainCamera;
 		public Camera minimapCamera;
+		public ReplayManager replayManager;
+		public Image replayDisplay;
 		public SmartCamera cam;
 		
 		public Transform menuContainer;
@@ -36,6 +38,8 @@ namespace TurtleIsland {
 		public Hooks(Environment env) {
 			mainCamera = JuloFind.byName<Camera>("MainCamera");
 			minimapCamera = JuloFind.byName<Camera>("MinimapCamera");
+			replayManager = JuloFind.byName<ReplayManager>("ReplayManager");
+			replayDisplay = JuloFind.byName<Image>("ReplayDisplay");
 			cam = mainCamera.GetComponent<SmartCamera>();
 			
 			menuContainer = JuloFind.byName<Transform>("Menu", env);

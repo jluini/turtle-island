@@ -17,7 +17,7 @@ namespace TurtleIsland {
 		public Controller activeController = null;
 		
 		// State management
-		private enum State { WAIT, APPLY_DAMAGE, DEAD, PREPARE, PLAY, OVER, CELEBRATE }
+		private enum State { WAIT, APPLY_DAMAGE, DEAD, PREPARE, PLAY, OVER, CELEBRATE, REPLAY }
 		private StateMachine<State> machine;
 		private TTPlayStatus playStatus;
 		
@@ -28,6 +28,10 @@ namespace TurtleIsland {
 		
 		private List<Character> damagedCharacters;
 		private List<Character> deadCharacters;
+		
+		private Replay replay;
+		private int lastShownFrame = -1;
+		private float replayTimestamp;
 		
 		public TurtleIslandGame(Environment env, Level level) : base(env.options) {
 			this.env = env;
@@ -85,6 +89,11 @@ namespace TurtleIsland {
 				if(!allIsQuiet()) {
 					machine.trigger(State.WAIT); // resets wait counter
 				} else if(machine.isOver(options.waitTime)) {
+					if(env.hk.replayManager.isRecording()) {
+						env.hk.replayManager.stop();
+						replay = env.hk.replayManager.getReplay();
+					}
+					
 					List<Character> reallyDamagedCharacters = new List<Character>();
 					
 					foreach(Character c in damagedCharacters) {
@@ -99,7 +108,7 @@ namespace TurtleIsland {
 						machine.trigger(State.APPLY_DAMAGE);
 					} else {
 						// if(damagedCharacters.Count > 0) { Debug.Log("Damaged characters but none to show"); }
-						checkOver();
+						endOfTurn();
 					}
 					
 					damagedCharacters.Clear();
@@ -119,7 +128,7 @@ namespace TurtleIsland {
 						env.focusAny(reallyDeadCharacters);
 						machine.trigger(State.DEAD);
 					} else {
-						checkOver();
+						endOfTurn();
 					}
 					
 					deadCharacters.Clear();
@@ -132,7 +141,7 @@ namespace TurtleIsland {
 				}
 			} else if(machine.state == State.DEAD) {
 				if(machine.isOver(options.deathTime)) {
-					checkOver();
+					endOfTurn();
 				}
 			} else if(machine.state == State.PLAY) {
 				if(!currentCharacter.isAlive()) {
@@ -183,6 +192,20 @@ namespace TurtleIsland {
 				if(machine.ellapsed() >= options.celebrateTime) {
 					// TODO restart();
 				}
+			} else if(machine.state == State.REPLAY) {
+				float ellapsed = JuloTime.applicationTimeSince(replayTimestamp);
+				
+				int normalized = (int)(ellapsed / env.hk.replayManager.interval);
+				//Debug.Log("ellapsed: " + ellapsed + ", normal: " + normalized);
+				
+				if(normalized < replay.sequence.Length) {
+					showReplay(normalized);
+				} else {
+					hideReplay();
+				}
+				
+			} else {
+				Debug.LogWarning("Unknown state: " + machine.state);
 			}
 		}
 		public override void onDeactivate(TurtleIslandObject obj) {
@@ -232,6 +255,7 @@ namespace TurtleIsland {
 			machine.trigger(State.PLAY); // resets machine counter
 			playStatus = TTPlayStatus.CHARGE;
 			currentCharacter.charge();
+			//env.circularBuffer.clear();
 		}
 		public void discharge() {
 			if(machine.state != State.PLAY || playStatus != TTPlayStatus.CHARGE)
@@ -261,6 +285,10 @@ namespace TurtleIsland {
 			env.focusObject(w);
 			
 			hideTurnControls();
+			
+			if(options.showReplay) {
+				env.hk.replayManager.record();
+			}
 		}
 		
 		public void setWeaponValue(int value) {
@@ -335,12 +363,26 @@ namespace TurtleIsland {
 			}
 			return true;
 		}
-		private void checkOver() {
-			if(teamManager.gameIsOver()) {
+		private bool isReplayable() {
+			return true;
+		}
+		
+		private void endOfTurn() {
+			if(options.showReplay && replay != null && isReplayable()) {
+				triggerReplay();
+			} else if(teamManager.gameIsOver()) {
 				triggerGameOver();
 			} else {
 				triggerNextTurn();
 			}
+		}
+		
+		private void triggerReplay() {
+			machine.trigger(State.REPLAY);
+			replayTimestamp = JuloTime.applicationTime();
+			
+			showReplay(0);
+			//Debug.Log("Triggering replay at " + replayTimestamp);
 		}
 		
 		private void triggerGameOver() {
@@ -416,5 +458,31 @@ namespace TurtleIsland {
 			return new Vector3((xMin + xMax) / 2f, 0f, 0f);
 		}
 		*/
+		void LateUpdate() {
+			Debug.Log("Calling LateUpdate");
+		}
+		
+		void showReplay(int normalized) {
+			if(normalized != lastShownFrame) {
+				lastShownFrame = normalized;
+				showScreenshot(replay.sequence[normalized].texture);
+			}
+		}
+		
+		void hideReplay() {
+			lastShownFrame = -1;
+			env.hk.replayDisplay.gameObject.SetActive(false);
+			replay = null;
+			endOfTurn();
+		}
+		
+		void showScreenshot(Texture2D texture) {
+			Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero, 100);
+			
+			env.hk.replayDisplay.gameObject.SetActive(true);
+			env.hk.replayDisplay.sprite = sprite;
+		}
+		
 	}
+	
 }

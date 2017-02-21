@@ -12,7 +12,8 @@ public class FollowDisplay : MonoBehaviour {
 		if(target != null) {
 			Vector3 targetPos = target.position;
 			Vector3 pos = targetPos + worldOffset;
-			Vector3 newPos = Camera.main.WorldToScreenPoint(pos) + screenOffset;
+			Camera cam = Camera.main;
+			Vector3 newPos = cam.WorldToScreenPoint(pos) + screenOffset;
 			transform.position = newPos;
 		} else {
 			Debug.Log("FollowDisplay following null object");

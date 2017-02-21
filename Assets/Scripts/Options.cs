@@ -16,6 +16,8 @@ namespace TurtleIsland {
 		public bool musicInitiallyOn = true;
 		public bool soundsInitiallyOn = true;
 		
+		public bool showReplay = false;
+		
 		[Header("Colors")]
 		public Color leftColor;
 		public Color rightColor;
