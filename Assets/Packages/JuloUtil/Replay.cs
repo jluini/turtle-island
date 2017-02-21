@@ -16,8 +16,11 @@ namespace JuloUtil {
 		public Texture2D texture;
 		
 		public Screenshot(Texture2D texture) {
-			this.timestamp = JuloTime.gameTime();
 			this.texture = texture;
+			updateTimestamp();
+		}
+		public void updateTimestamp() {
+			this.timestamp = JuloTime.gameTime();
 		}
 	}
 }

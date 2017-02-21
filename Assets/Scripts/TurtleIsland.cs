@@ -10,6 +10,49 @@ namespace TurtleIsland {
 	
 	public enum TTPlayStatus { PREPARE, CHARGE, DONE, OVER }
 	
+	public enum CharacterStatus { READY, INACTIVE, DEAD }
+	
+	public class TurtleIslandStatus {
+		public int readyTeams;
+		public int readyChars;
+		
+		int numTeams;
+		int numCharacters;
+		
+		CharacterStatus[][] characterStatus;
+		
+		public TurtleIslandStatus(int numTeams, int numCharacters) {
+			this.numTeams = numTeams;
+			this.numCharacters = numCharacters;
+			
+			characterStatus = new CharacterStatus[numTeams][];
+			for(int t = 0; t < numTeams; t++) {
+				characterStatus[t] = new CharacterStatus[numCharacters];
+			}
+		}
+		
+		public bool isOver() {
+			return readyTeams < 2;
+			/*
+			int numberOfReadyTeams = 0;
+			for(int t = 0; t < numTeams; t++) {
+				bool isReady = false;
+				for(int c = 0; c < numCharacters; c++) {
+					if(characterStatus[t][c] == CharacterStatus.READY) {
+						isReady = true;
+						break;
+					}
+				}
+				if(isReady) {
+					numberOfReadyTeams++;
+				}
+			}
+			
+			return numberOfReadyTeams < 2;
+			*/
+		}
+	}
+	
 	public class TurtleIsland {
 		public const int NumTeams = 2;
 		public const int LeftTeamId = 0;

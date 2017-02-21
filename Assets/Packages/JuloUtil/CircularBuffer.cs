@@ -4,10 +4,8 @@ using UnityEngine;
 
 namespace JuloUtil {
 	public class CircularBuffer<T> {
-		
 		private T[] arr;
 		private int maxSize;
-		
 		
 		private int _length = 0;
 		public int length {
@@ -51,6 +49,14 @@ namespace JuloUtil {
 			}
 			
 			arr[endIndex] = elem;
+		}
+		
+		public T elemToOverride() {
+			if(_length == 0) {
+				return arr[endIndex];
+			} else {
+				return arr[(endIndex + 1) % maxSize];
+			}
 		}
 		
 		public T get(int index) {

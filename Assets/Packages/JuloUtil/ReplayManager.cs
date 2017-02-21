@@ -38,12 +38,19 @@ namespace JuloUtil {
 		}
 		private IEnumerator __takeFrame() {
 			yield return new WaitForEndOfFrame();
-			Texture2D frame = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);  
-			//RenderTexture.active = null; // TODO ??
-			frame.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);  
-			frame.Apply();  
+			Screenshot frame = buffer.elemToOverride();
 			
-			buffer.save(new Screenshot(frame));
+			if(frame == null) {
+				Texture2D newTexture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);  
+				frame = new Screenshot(newTexture);
+			} else {
+				frame.updateTimestamp();
+			}
+			//RenderTexture.active = null; // TODO ??
+			frame.texture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);  
+			frame.texture.Apply();  
+			
+			buffer.save(frame);
 		}
 		
 		public void stop() {

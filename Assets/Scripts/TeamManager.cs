@@ -12,10 +12,16 @@ namespace TurtleIsland {
 		private List<Team> teams;
 		private Dictionary<Character, float> characterLastTurn;
 		
-		public TeamManager() {
+		private int numTeams;
+		private int numCharacters;
+		
+		public TeamManager(int numTeams, int numCharaters) {
+			this.numTeams = numTeams;
+			this.numCharacters = numCharacters;
 			this.teams = new List<Team>();
 			characterLastTurn = new Dictionary<Character, float>();
 			currentTeamIndex = -1;
+			//Debug.Log("new team manager: 0");
 		}
 		
 		public void startsTeam(int teamId) {
@@ -99,19 +105,27 @@ namespace TurtleIsland {
 			return currentCharacter;
 		}
 		
-		public bool gameIsOver() {
-			int numTeams = teams.Count;
-			if(numTeams < 2)
-				throw new ApplicationException("Least than two teams (" + numTeams + ")");
+		public TurtleIslandStatus getStatus() {
+			TurtleIslandStatus ret = new TurtleIslandStatus(numTeams, numCharacters);
 			
-			int numberOfReadyTeams = 0;
+			// TODO remove this!
+			int readyTeams = 0;
+			int readyChars = 0;
 			foreach(Team t in teams) {
-				if(t.isReady()) {
-					numberOfReadyTeams++;
+				bool teamIsReady = false;
+				foreach(Character c in t) {
+					if(c.isReady()) {
+						readyChars++;
+						teamIsReady = true;
+					}
 				}
+				if(teamIsReady)
+					readyTeams++;
 			}
+			ret.readyTeams = readyTeams;
+			ret.readyChars = readyChars;
 			
-			return numberOfReadyTeams < 2;
+			return ret;
 		}
 		
 		public Team getSomeReadyTeam() {

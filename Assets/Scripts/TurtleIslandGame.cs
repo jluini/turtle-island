@@ -29,11 +29,13 @@ namespace TurtleIsland {
 		private List<Character> damagedCharacters;
 		private List<Character> deadCharacters;
 		
+		private TurtleIslandStatus oldStatus;
+		private TurtleIslandStatus gameStatus;
 		private int replayLength = 0;
 		private int lastShownFrame = -1;
 		private float replayTimestamp;
 		
-		public TurtleIslandGame(Environment env, Level level) : base(env.options) {
+		public TurtleIslandGame(Environment env, Level level, int numCharacters) : base(env.options) {
 			this.env = env;
 			this.level = level;
 			
@@ -41,7 +43,7 @@ namespace TurtleIsland {
 			damagedCharacters = new List<Character>();
 			deadCharacters = new List<Character>();
 			
-			this.teamManager = new TeamManager(); // TODO detect teams from characters
+			this.teamManager = new TeamManager(2, numCharacters); // TODO detect teams from characters
 			leftTeam  = new Team(TurtleIsland.LeftTeamId,  TurtleIsland.LeftTeamName,  options.leftColor,  options.leftController);
 			rightTeam = new Team(TurtleIsland.RightTeamId, TurtleIsland.RightTeamName, options.rightColor, options.rightController);
 			
@@ -366,16 +368,23 @@ namespace TurtleIsland {
 			return true;
 		}
 		private bool isReplayable() {
-			return true;
+			return gameStatus.readyChars != oldStatus.readyChars;
+			//return gameStatus.isOver();
 		}
 		
 		private void endOfTurn() {
+			this.oldStatus = this.gameStatus;
+			this.gameStatus = teamManager.getStatus();
+			
 			if(options.showReplay && replayLength > 0 && isReplayable()) {
 				triggerReplay();
-			} else if(teamManager.gameIsOver()) {
-				triggerGameOver();
 			} else {
-				triggerNextTurn();
+				replayLength = 0;
+				if(gameStatus.isOver()) {
+					triggerGameOver();
+				} else {
+					triggerNextTurn();
+				}
 			}
 		}
 		

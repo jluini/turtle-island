@@ -96,10 +96,13 @@ namespace TurtleIsland {
 			if(!modelsLoaded)
 				throw new ApplicationException("Unloaded models");
 			
-			TurtleIslandGame ret = new TurtleIslandGame(env, this);
+			int numTurtles = opt.numberOfTurtles;
+			int numClones = opt.numberOfClones;
+					
+			TurtleIslandGame ret = new TurtleIslandGame(env, this, numTurtles * numClones);
 			
-			for(int k = 0; k < opt.numberOfClones; k++) {
-				for(int i = 0; i < opt.numberOfTurtles; i++) {
+			for(int k = 0; k < numClones; k++) {
+				for(int i = 0; i < numTurtles; i++) {
 					Character lChar = getClone(leftModels[i]);
 					ret.addCharacter(lChar);
 					Character rChar = getClone(rightModels[i]);
