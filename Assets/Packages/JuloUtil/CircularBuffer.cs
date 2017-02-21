@@ -8,7 +8,14 @@ namespace JuloUtil {
 		private T[] arr;
 		private int maxSize;
 		
-		private bool empty = true;
+		
+		private int _length = 0;
+		public int length {
+			get {
+				return _length;
+			}
+		}
+		
 		private int startIndex = 0;
 		private int endIndex = 0;
 		
@@ -21,48 +28,33 @@ namespace JuloUtil {
 		}
 		
 		public void clear() {
-			this.empty = true;
+			this._length = 0;
 			this.startIndex = 0;
 			this.endIndex = 0;
 		}
 		
 		public void save(T elem) {
-			if(empty) {
-				empty = false;
+			if(_length == 0) {
+				_length = 1;
 				if(endIndex != startIndex)
-					Debug.LogWarning("Should be equal?");
+					Debug.LogWarning("Should be equal");
 				endIndex = startIndex;
-			} else {
+			} else if(_length > 0) {
 				endIndex = (endIndex + 1) % maxSize;
 				if(startIndex == endIndex) {
 					startIndex = (startIndex + 1) % maxSize;
+				} else {
+					_length++;
 				}
+			} else {
+				throw new ApplicationException("negative length");
 			}
 			
 			arr[endIndex] = elem;
-			
-			//Debug.Log(startIndex + ":" + endIndex + "--=>--" + oldSize + " -> " + getSize());
 		}
 		
-		public int getSize() {
-			if(empty) {
-				return 0; 
-			} else if(startIndex <= endIndex) {
-				return endIndex - startIndex + 1;
-			} else {
-				return endIndex - startIndex + maxSize + 1;
-			}
-		}
-		
-		public T[] getSequence() {
-			int size = getSize();
-			T[] ret = new T[size];
-			
-			for(int i = 0; i < size; i++) {
-				ret[i] = arr[(startIndex + i) % maxSize];
-			}
-			
-			return ret;
+		public T get(int index) {
+			return arr[(startIndex + index) % maxSize];
 		}
 	}
 }

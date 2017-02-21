@@ -39,14 +39,11 @@ namespace JuloUtil {
 		private IEnumerator __takeFrame() {
 			yield return new WaitForEndOfFrame();
 			Texture2D frame = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);  
-			RenderTexture.active=null;  //`enter code here`
+			//RenderTexture.active = null; // TODO ??
 			frame.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);  
 			frame.Apply();  
-			//lastFrame = texture;
 			
 			buffer.save(new Screenshot(frame));
-			
-			//Debug.Log("Taking frame: " + buffer.getSize());
 		}
 		
 		public void stop() {
@@ -54,9 +51,6 @@ namespace JuloUtil {
 				throw new ApplicationException("Is not recording");
 			}
 			recording = false;
-			
-			//CancelInvoke("takeFrame");
-			// ...
 		}
 		
 		public void LateUpdate() {
@@ -65,14 +59,17 @@ namespace JuloUtil {
 				float ellapsed = now - timestamp;
 				if(ellapsed >= interval) {
 					timestamp = now;
-					//Debug.Log("other call");
 					takeFrame();
 				}
 			}
 		}
 		
-		public Replay getReplay() {
-			return new Replay(buffer.getSequence());
+		public int getReplayLength() {
+			return buffer.length;
+		}
+		
+		public Screenshot get(int index) {
+			return buffer.get(index);
 		}
 	}
 }

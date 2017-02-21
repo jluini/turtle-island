@@ -29,7 +29,7 @@ namespace TurtleIsland {
 		private List<Character> damagedCharacters;
 		private List<Character> deadCharacters;
 		
-		private Replay replay;
+		private int replayLength = 0;
 		private int lastShownFrame = -1;
 		private float replayTimestamp;
 		
@@ -91,7 +91,8 @@ namespace TurtleIsland {
 				} else if(machine.isOver(options.waitTime)) {
 					if(env.hk.replayManager.isRecording()) {
 						env.hk.replayManager.stop();
-						replay = env.hk.replayManager.getReplay();
+						replayLength = env.hk.replayManager.getReplayLength();
+						//replay = env.hk.replayManager.getReplay();
 					}
 					
 					List<Character> reallyDamagedCharacters = new List<Character>();
@@ -104,7 +105,7 @@ namespace TurtleIsland {
 					}
 					
 					if(reallyDamagedCharacters.Count > 0) {
-						env.focusAny(reallyDamagedCharacters);
+						//env.focusAny(reallyDamagedCharacters);
 						machine.trigger(State.APPLY_DAMAGE);
 					} else {
 						// if(damagedCharacters.Count > 0) { Debug.Log("Damaged characters but none to show"); }
@@ -198,7 +199,7 @@ namespace TurtleIsland {
 				int normalized = (int)(ellapsed / env.hk.replayManager.interval);
 				//Debug.Log("ellapsed: " + ellapsed + ", normal: " + normalized);
 				
-				if(normalized < replay.sequence.Length) {
+				if(normalized < replayLength) {
 					showReplay(normalized);
 				} else {
 					hideReplay();
@@ -287,6 +288,7 @@ namespace TurtleIsland {
 			hideTurnControls();
 			
 			if(options.showReplay) {
+				replayLength = 0;
 				env.hk.replayManager.record();
 			}
 		}
@@ -368,7 +370,7 @@ namespace TurtleIsland {
 		}
 		
 		private void endOfTurn() {
-			if(options.showReplay && replay != null && isReplayable()) {
+			if(options.showReplay && replayLength > 0 && isReplayable()) {
 				triggerReplay();
 			} else if(teamManager.gameIsOver()) {
 				triggerGameOver();
@@ -465,18 +467,19 @@ namespace TurtleIsland {
 		void showReplay(int normalized) {
 			if(normalized != lastShownFrame) {
 				lastShownFrame = normalized;
-				showScreenshot(replay.sequence[normalized].texture);
+				showScreenshot(env.hk.replayManager.get(normalized).texture);
 			}
 		}
 		
 		void hideReplay() {
 			lastShownFrame = -1;
 			env.hk.replayDisplay.gameObject.SetActive(false);
-			replay = null;
+			replayLength = 0;
 			endOfTurn();
 		}
 		
 		void showScreenshot(Texture2D texture) {
+			//Debug.Log("Creating sprite at " + JuloTime.applicationTime());
 			Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero, 100);
 			
 			env.hk.replayDisplay.gameObject.SetActive(true);
