@@ -16,7 +16,10 @@ namespace TurtleIsland {
 		public bool musicInitiallyOn = true;
 		public bool soundsInitiallyOn = true;
 		
+		[Header("Replay")]
 		public bool showReplay = false;
+		public float replayInterval = 0.25f;
+		public float replayLength   = 8f;
 		
 		[Header("Colors")]
 		public Color leftColor;
