@@ -75,6 +75,10 @@ namespace TurtleIsland {
 			
 			menu.init(this);
 			
+			hk.replayManager.display       = hk.replayDisplay;
+			hk.replayManager.interval      = options.replayInterval;
+			hk.replayManager.maximumLength = options.replayLength;
+			
 			hk.musicPlayer.init();
 			
 			if(options.musicInitiallyOn) {

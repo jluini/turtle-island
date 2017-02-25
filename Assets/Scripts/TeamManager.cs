@@ -15,13 +15,12 @@ namespace TurtleIsland {
 		private int numTeams;
 		private int numCharacters;
 		
-		public TeamManager(int numTeams, int numCharaters) {
+		public TeamManager(int numTeams, int numCharacters) {
 			this.numTeams = numTeams;
 			this.numCharacters = numCharacters;
 			this.teams = new List<Team>();
 			characterLastTurn = new Dictionary<Character, float>();
 			currentTeamIndex = -1;
-			//Debug.Log("new team manager: 0");
 		}
 		
 		public void startsTeam(int teamId) {

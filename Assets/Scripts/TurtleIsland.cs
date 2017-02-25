@@ -16,14 +16,14 @@ namespace TurtleIsland {
 		public int readyTeams;
 		public int readyChars;
 		
-		int numTeams;
-		int numCharacters;
+		// int numTeams;
+		// int numCharacters;
 		
 		CharacterStatus[][] characterStatus;
 		
 		public TurtleIslandStatus(int numTeams, int numCharacters) {
-			this.numTeams = numTeams;
-			this.numCharacters = numCharacters;
+			// this.numTeams = numTeams;
+			// this.numCharacters = numCharacters;
 			
 			characterStatus = new CharacterStatus[numTeams][];
 			for(int t = 0; t < numTeams; t++) {
@@ -227,10 +227,10 @@ namespace TurtleIsland {
 			
 			
 			if(t < 0f) {
-				Debug.Log(String.Format("Barrier {0} at {1}: {2}", target, t, "antes"));
+				//Debug.Log(String.Format("Barrier {0} at {1}: {2}", target, t, "antes"));
 				return false;
 			} else if(t > fuse) {
-				Debug.Log(String.Format("Barrier {0} at {1}: {2}", target, t, "despues"));
+				//Debug.Log(String.Format("Barrier {0} at {1}: {2}", target, t, "despues"));
 				return false;
 			}
 			

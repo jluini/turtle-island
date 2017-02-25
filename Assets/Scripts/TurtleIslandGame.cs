@@ -60,8 +60,6 @@ namespace TurtleIsland {
 			options.leftController.initialize(this, options.difficulty);
 			options.rightController.initialize(this, options.difficulty);
 			
-			//env.hk.mainTimeDisplay.showText(((int)options.playTime).ToString());
-			
 			hideControls();
 		}
 		
@@ -91,30 +89,20 @@ namespace TurtleIsland {
 				if(!allIsQuiet()) {
 					machine.trigger(State.WAIT); // resets wait counter
 				} else if(machine.isOver(options.waitTime)) {
+					this.oldStatus = this.gameStatus;
+					this.gameStatus = teamManager.getStatus();
+					
 					if(env.hk.replayManager.isRecording()) {
 						env.hk.replayManager.stop();
 						replayLength = env.hk.replayManager.getReplayLength();
-						//replay = env.hk.replayManager.getReplay();
 					}
 					
-					List<Character> reallyDamagedCharacters = new List<Character>();
-					
-					foreach(Character c in damagedCharacters) {
-						if(c.isActive() && !c.sinked) {
-							c.applyDamage();
-							reallyDamagedCharacters.Add(c);
-						}
-					}
-					
-					if(reallyDamagedCharacters.Count > 0) {
-						//env.focusAny(reallyDamagedCharacters);
-						machine.trigger(State.APPLY_DAMAGE);
+					if(replayLength > 0 && isReplayable()) {
+						triggerReplay();
 					} else {
-						// if(damagedCharacters.Count > 0) { Debug.Log("Damaged characters but none to show"); }
-						endOfTurn();
+						triggerApply();
+						replayLength = 0;
 					}
-					
-					damagedCharacters.Clear();
 				}
 			} else if(machine.state == State.APPLY_DAMAGE) {
 				if(machine.isOver(options.applyDamageTime)) {
@@ -199,14 +187,15 @@ namespace TurtleIsland {
 				float ellapsed = JuloTime.applicationTimeSince(replayTimestamp);
 				
 				int normalized = (int)(ellapsed / env.hk.replayManager.interval);
-				//Debug.Log("ellapsed: " + ellapsed + ", normal: " + normalized);
 				
 				if(normalized < replayLength) {
 					showReplay(normalized);
 				} else {
-					hideReplay();
+					lastShownFrame = -1;
+					env.hk.replayDisplay.gameObject.SetActive(false);
+					replayLength = 0;
+					triggerApply();
 				}
-				
 			} else {
 				Debug.LogWarning("Unknown state: " + machine.state);
 			}
@@ -258,7 +247,6 @@ namespace TurtleIsland {
 			machine.trigger(State.PLAY); // resets machine counter
 			playStatus = TTPlayStatus.CHARGE;
 			currentCharacter.charge();
-			//env.circularBuffer.clear();
 		}
 		public void discharge() {
 			if(machine.state != State.PLAY || playStatus != TTPlayStatus.CHARGE)
@@ -324,7 +312,6 @@ namespace TurtleIsland {
 				env.hk.soundsControl.soundSource.playClip(options.explosionClip, 1f);
 			
 			float maxMagnitude = 0;
-			//int maxDamage = 0;
 			Character maxMagnitudeChar = null;
 			
 			foreach(Character c in teamManager.allActiveCharacters()) {
@@ -348,7 +335,6 @@ namespace TurtleIsland {
 					
 					if(magnitude > maxMagnitude) {
 						maxMagnitude = magnitude;
-						//maxDamage = damage;
 						maxMagnitudeChar = c;
 					}
 				}
@@ -373,18 +359,10 @@ namespace TurtleIsland {
 		}
 		
 		private void endOfTurn() {
-			this.oldStatus = this.gameStatus;
-			this.gameStatus = teamManager.getStatus();
-			
-			if(options.showReplay && replayLength > 0 && isReplayable()) {
-				triggerReplay();
+			if(gameStatus.isOver()) {
+				triggerGameOver();
 			} else {
-				replayLength = 0;
-				if(gameStatus.isOver()) {
-					triggerGameOver();
-				} else {
-					triggerNextTurn();
-				}
+				triggerNextTurn();
 			}
 		}
 		
@@ -393,7 +371,26 @@ namespace TurtleIsland {
 			replayTimestamp = JuloTime.applicationTime();
 			
 			showReplay(0);
-			//Debug.Log("Triggering replay at " + replayTimestamp);
+		}
+		
+		private void triggerApply() {
+			List<Character> reallyDamagedCharacters = new List<Character>();
+			
+			foreach(Character c in damagedCharacters) {
+				if(c.isActive() && !c.sinked) {
+					c.applyDamage();
+					reallyDamagedCharacters.Add(c);
+				}
+			}
+			
+			if(reallyDamagedCharacters.Count > 0) {
+				//env.focusAny(reallyDamagedCharacters);
+				machine.trigger(State.APPLY_DAMAGE);
+			} else {
+				endOfTurn();
+			}
+			
+			damagedCharacters.Clear();
 		}
 		
 		private void triggerGameOver() {
@@ -401,7 +398,6 @@ namespace TurtleIsland {
 			Team winner = teamManager.getSomeReadyTeam();
 			
 			if(winner != null) {
-				//focusCelebration();
 				env.focusObject(teamManager.getLastCharacterOf(winner));
 			}
 		}
@@ -446,55 +442,14 @@ namespace TurtleIsland {
 			env.hk.teamDisplays[TurtleIsland.LeftTeamId].setWeapon(level.weapons[leftTeam.weaponIndex], leftTeam.weaponValue);
 			env.hk.teamDisplays[TurtleIsland.RightTeamId].setWeapon(level.weapons[rightTeam.weaponIndex], rightTeam.weaponValue);
 		}
-		/*
-		private void focusCelebration() {
-			GameObject celebrationTarget = new GameObject("CelebrationTarget");
-			celebrationTarget.transform.position = celebratePosition(winner);
-			env.focusPosition(celebrationTarget.transform);
-		}
-		private Vector3 celebratePosition() {
-			float xMin = +10000f;
-			float xMax = -10000f;
-			
-			foreach(Character c in winner) {
-				if(c.isReady()) {
-					float x = c.transform.position.x;
-					xMin = Mathf.Min(x, xMin);
-					xMax = Mathf.Max(x, xMax);
-					
-					// TODO corregir esto
-					break;
-				}
-			}
-			return new Vector3((xMin + xMax) / 2f, 0f, 0f);
-		}
-		*/
-		void LateUpdate() {
-			Debug.Log("Calling LateUpdate");
-		}
 		
 		void showReplay(int normalized) {
 			if(normalized != lastShownFrame) {
 				lastShownFrame = normalized;
-				showScreenshot(env.hk.replayManager.get(normalized).texture);
+				//env.hk.replayManager.showScreenshot(env.hk.replayManager.get(normalized).texture);
+				env.hk.replayManager.showFrame(normalized);
 			}
 		}
-		
-		void hideReplay() {
-			lastShownFrame = -1;
-			env.hk.replayDisplay.gameObject.SetActive(false);
-			replayLength = 0;
-			endOfTurn();
-		}
-		
-		void showScreenshot(Texture2D texture) {
-			//Debug.Log("Creating sprite at " + JuloTime.applicationTime());
-			Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero, 100);
-			
-			env.hk.replayDisplay.gameObject.SetActive(true);
-			env.hk.replayDisplay.sprite = sprite;
-		}
-		
 	}
 	
 }
