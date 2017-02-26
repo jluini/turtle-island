@@ -182,16 +182,22 @@ public class SmartController : Controller {
 			} else {
 				//Character rival = rivals[0];
 				
-				int first = JuloMath.randomBool(0.5f) ? 3 : 4;
-				int second = (first - 3) * -1 + 1 + 3;
+				int first  = JuloMath.randomInt(3, 5);
+				//int second = (first - 2) % 3 + 3;
+				//int third = (second - 2) % 3 + 3;
 				
-				shot = getTetaInterna(!leftSide, first - 1, first);
+				shot = getTetaInterna(!leftSide, 2, first);
+				
 				if(hitsSomeBarrier(shot)) {
-					shot = getTetaInterna(!leftSide, second - 1, second);
-					if(debugEnabled)
-						Debug.Log(hitsSomeBarrier(shot) ? "Yet hitting barrier" : "Tiro de descarte 2");
-				} else {
-					if(debugEnabled) Debug.Log("Tiro de descarte 1");
+					Debug.Log("No se encontro nada");
+					/*shot = getTetaInterna(!leftSide, 2, second);
+					if(hitsSomeBarrier(shot)) {
+						shot = getTetaInterna(!leftSide, 2, third);
+					}*/
+					//if(debugEnabled)
+						//Debug.Log(hitsSomeBarrier(shot) ? "Yet hitting barrier" : "Tiro de descarte 2");
+				//} else {
+				//if(debugEnabled) Debug.Log("Tiro de descarte 1");
 				}
 			}
 		}

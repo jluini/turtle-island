@@ -267,7 +267,7 @@ namespace TurtleIsland {
 			
 			env.focusObject(w);
 			
-			hideTurnControls();
+			//hideTurnControls();
 			
 			if(options.showReplay) {
 				env.hk.replayManager.record();
