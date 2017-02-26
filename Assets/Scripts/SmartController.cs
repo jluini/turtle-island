@@ -174,7 +174,7 @@ public class SmartController : Controller {
 			
 			if(remaining < walkingTime * 2) {
 				if(debugEnabled) Debug.Log("Tiro apurado");
-				shot = getTetaInterna(!leftSide, 3f, 4f);
+				shot = getTetaInterna(!leftSide, 3f, 5f);
 			} else if(Mathf.Abs(pa.x) < 1.8f) {
 				walk(leftSide);  // caminar hacia afuera
 			} else if(Math.Abs(pa.x) > 6.5f) {
@@ -182,9 +182,12 @@ public class SmartController : Controller {
 			} else {
 				//Character rival = rivals[0];
 				
-				shot = getTetaInterna(!leftSide, 2f, 3f);
+				int first = JuloMath.randomBool(0.5f) ? 3 : 4;
+				int second = (first - 3) * -1 + 1 + 3;
+				
+				shot = getTetaInterna(!leftSide, first - 1, first);
 				if(hitsSomeBarrier(shot)) {
-					shot = getTetaInterna(!leftSide, 3f, 4f);
+					shot = getTetaInterna(!leftSide, second - 1, second);
 					if(debugEnabled)
 						Debug.Log(hitsSomeBarrier(shot) ? "Yet hitting barrier" : "Tiro de descarte 2");
 				} else {
