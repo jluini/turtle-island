@@ -31,9 +31,6 @@ namespace TurtleIsland {
 		
 		private TurtleIslandStatus oldStatus;
 		private TurtleIslandStatus gameStatus;
-		private int replayLength = 0;
-		private int lastShownFrame = -1;
-		private float replayTimestamp;
 		
 		public TurtleIslandGame(Environment env, Level level, int numCharacters) : base(env.options) {
 			this.env = env;
@@ -94,14 +91,17 @@ namespace TurtleIsland {
 					
 					if(env.hk.replayManager.isRecording()) {
 						env.hk.replayManager.stop();
-						replayLength = env.hk.replayManager.getReplayLength();
 					}
 					
-					if(replayLength > 0 && isReplayable()) {
-						triggerReplay();
+					if(env.hk.replayManager.hasRecord()) {
+						if(isReplayable()) {
+							triggerReplay();
+						} else {
+							triggerApply();
+							env.hk.replayManager.clear();
+						}
 					} else {
 						triggerApply();
-						replayLength = 0;
 					}
 				}
 			} else if(machine.state == State.APPLY_DAMAGE) {
@@ -184,17 +184,9 @@ namespace TurtleIsland {
 					// TODO restart();
 				}
 			} else if(machine.state == State.REPLAY) {
-				float ellapsed = JuloTime.applicationTimeSince(replayTimestamp);
-				
-				int normalized = (int)(ellapsed / env.hk.replayManager.interval);
-				
-				if(normalized < replayLength) {
-					showReplay(normalized);
-				} else {
-					lastShownFrame = -1;
-					env.hk.replayDisplay.gameObject.SetActive(false);
-					replayLength = 0;
+				if(!env.hk.replayManager.isReplaying()) {
 					triggerApply();
+					env.hk.replayManager.clear();
 				}
 			} else {
 				Debug.LogWarning("Unknown state: " + machine.state);
@@ -278,7 +270,6 @@ namespace TurtleIsland {
 			hideTurnControls();
 			
 			if(options.showReplay) {
-				replayLength = 0;
 				env.hk.replayManager.record();
 			}
 		}
@@ -368,9 +359,7 @@ namespace TurtleIsland {
 		
 		private void triggerReplay() {
 			machine.trigger(State.REPLAY);
-			replayTimestamp = JuloTime.applicationTime();
-			
-			showReplay(0);
+			env.hk.replayManager.showReplay();
 		}
 		
 		private void triggerApply() {
@@ -442,14 +431,5 @@ namespace TurtleIsland {
 			env.hk.teamDisplays[TurtleIsland.LeftTeamId].setWeapon(level.weapons[leftTeam.weaponIndex], leftTeam.weaponValue);
 			env.hk.teamDisplays[TurtleIsland.RightTeamId].setWeapon(level.weapons[rightTeam.weaponIndex], rightTeam.weaponValue);
 		}
-		
-		void showReplay(int normalized) {
-			if(normalized != lastShownFrame) {
-				lastShownFrame = normalized;
-				//env.hk.replayManager.showScreenshot(env.hk.replayManager.get(normalized).texture);
-				env.hk.replayManager.showFrame(normalized);
-			}
-		}
 	}
-	
 }

@@ -26,10 +26,6 @@ namespace TurtleIsland {
 		[HideInInspector]
 		public Level currentLevel = null;
 		
-		//public CircularBuffer<Texture2D> circularBuffer = new CircularBuffer<Texture2D>(15);
-		
-		//public Texture2D lastFrame;
-		
 		private TurtleIslandGame currentGame = null;
 		private bool fakeGame = false;
 		
@@ -75,9 +71,10 @@ namespace TurtleIsland {
 			
 			menu.init(this);
 			
-			hk.replayManager.display       = hk.replayDisplay;
-			hk.replayManager.interval      = options.replayInterval;
-			hk.replayManager.maximumLength = options.replayLength;
+			hk.replayManager.display         = hk.replayDisplay;
+			hk.replayManager.maxSize         = options.replayMaxSize;
+			hk.replayManager.minimumInterval = options.replayMinimumInterval;
+			hk.replayManager.lastFrameDelay  = options.replayDelay;
 			
 			hk.musicPlayer.init();
 			
@@ -93,52 +90,13 @@ namespace TurtleIsland {
 			//fakeGame = true;
 			//playGame(Mode.ZERO_PLAYERS, TurtleIsland.Medium, 3);
 		}
-		/*
-		private void saveFrame() {
-			//hk.replayCamera.Render();
-			lastFrame = RTImage(hk.replayCamera);
-		}
-		*/
-		/*
-		private IEnumerator saveFrame() {
-			yield return new WaitForEndOfFrame();
-			
-			Texture2D texture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);  
-			RenderTexture.active=null;  //`enter code here`
-			texture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);  
-			texture.Apply();  
-			
-			lastFrame = texture;
-			//byte[] pngData = texture.EncodeToPNG();
-			//MemoryStream pngStream = new MemoryStream(pngData);  
-			
-			//File.WriteAllBytes("lavida.png", pngData); 
-		}
-			*/
 		
 		public void Update() {
-			/*
-			if(circularBuffer.isRunning()) {
-				StartCoroutine(saveFrame());
-			} else {
-				lastFrame = null;
-			}
-			*/
 			if(isPlaying()) {
 				currentGame.step();
 				updateSelector();
 				hk.cam.updateCamera();
-				/*
-				if(circularBuffer.isRunning()) {
-					Texture2D frameImage = lastFrame;
-					if(frameImage != null) {
-						Debug.Log("Saving frame");
-						circularBuffer.save(frameImage);
-					} else {
-						Debug.Log("Ignoring frame");
-					}
-				}
-				*/
+				
 				if(!isOver && currentGame.isOver()) {
 					isOver = true;
 					autoMenuIsPending = true;

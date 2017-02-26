@@ -18,8 +18,9 @@ namespace TurtleIsland {
 		
 		[Header("Replay")]
 		public bool showReplay = false;
-		public float replayInterval = 0.25f;
-		public float replayLength   = 8f;
+		public int replayMaxSize = 100;
+		public float replayDelay = 5f;
+		public float replayMinimumInterval = 0f;
 		
 		[Header("Colors")]
 		public Color leftColor;
