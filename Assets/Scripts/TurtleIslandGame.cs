@@ -36,6 +36,8 @@ namespace TurtleIsland {
 			this.env = env;
 			this.level = level;
 			
+			env.hk.replayManager.clear();
+			
 			this.machine = new StateMachine<State>(State.WAIT);
 			damagedCharacters = new List<Character>();
 			deadCharacters = new List<Character>();

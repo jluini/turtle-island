@@ -113,7 +113,11 @@ namespace JuloUtil {
 		}
 		
 		public void clear() {
-			buffer.clear();
+			if(isRecording())
+				stop();
+			
+			if(buffer != null)
+				buffer.clear();
 		}
 		
 		public bool hasRecord() {
@@ -121,6 +125,9 @@ namespace JuloUtil {
 		}
 		
 		public void LateUpdate() {
+			if(Time.timeScale == 0f)
+				return;
+			
 			if(state == ReplayManagerState.RECORDING) {
 				float now = JuloTime.gameTime();
 				if(buffer.length == 0 || now - buffer.get(buffer.length - 1).timestamp >= minimumInterval) {
