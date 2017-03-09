@@ -114,12 +114,10 @@ public class SmartController : Controller {
 		}
 	}
 	
-	public override void setValue(int number) {
-		// nothing
-	}
-	public override void nextWeapon() {
-		// nothing
-	}
+	public override void setValue(int number) { } // nothing
+	public override void incrementValue() { } // nothing
+	public override void decrementValue() { } // nothing
+	public override void nextWeapon() { } // nothing
 	
 	void think(float factor) {
 		float thinkTime;

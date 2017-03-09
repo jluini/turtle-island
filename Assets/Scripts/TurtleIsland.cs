@@ -132,6 +132,8 @@ namespace TurtleIsland {
 		public abstract void dischargeForced();
 		
 		public abstract void setValue(int number);
+		public abstract void incrementValue();
+		public abstract void decrementValue();
 		public abstract void nextWeapon();
 	}
 	

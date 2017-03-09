@@ -284,6 +284,23 @@ namespace TurtleIsland {
 				Debug.Log("Invalid call of setWeaponValue");
 			}
 		}
+		public void incrementWeaponValue() {
+			if(activeController != null && currentTeam.weaponValue < 6) {
+				currentTeam.weaponValue++;
+				updateWeaponInfo();
+			//} else {
+			//	Debug.Log("Invalid call of setWeaponValue");
+			}
+		}
+		public void decrementWeaponValue() {
+			if(activeController != null && currentTeam.weaponValue > 1) {
+				currentTeam.weaponValue--;
+				updateWeaponInfo();
+			//} else {
+			//	Debug.Log("Invalid call of setWeaponValue");
+			}
+		}
+		
 		public void nextWeapon() {
 			if(activeController != null) {
 				currentTeam.setWeapon(

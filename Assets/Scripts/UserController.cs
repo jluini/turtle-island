@@ -50,5 +50,12 @@ namespace TurtleIsland {
 		public override void nextWeapon() {
 			game.nextWeapon();
 		}
+		public override void incrementValue() {
+			game.incrementWeaponValue();
+		}
+		public override void decrementValue() {
+			game.decrementWeaponValue();
+		}
+		
 	}
 }

@@ -93,6 +93,17 @@ namespace TurtleIsland {
 		
 		public void Update() {
 			if(isPlaying()) {
+				if(currentGame.activeController && Input.GetButtonDown("WeaponValue")) {
+					float rawValue = Input.GetAxisRaw("WeaponValue");
+					if(rawValue > 0) {
+						currentGame.activeController.incrementValue();
+					} else if(rawValue < 0) {
+						currentGame.activeController.decrementValue();
+					} else {
+						Debug.LogWarning("No se leyó ningún valor");
+					}
+				}
+				
 				currentGame.step();
 				updateSelector();
 				hk.cam.updateCamera();
