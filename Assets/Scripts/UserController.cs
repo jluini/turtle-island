@@ -23,9 +23,9 @@ namespace TurtleIsland {
 		}
 		
 		public override void step() {
-			float hAxis = Input.GetAxis("Horizontal");
-			float vAxis = Input.GetAxis("Vertical");
-			float fAxis = Input.GetAxis("Fire1");
+			float hAxis = game.env.inputManager.getAxis("Horizontal");
+			float vAxis = game.env.inputManager.getAxis("Vertical");
+			float fAxis = game.env.inputManager.getAxis("Fire");
 			
 			if(status == TTPlayStatus.PREPARE && fAxis != 0f) {
 				game.charge();

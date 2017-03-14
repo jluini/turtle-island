@@ -5,12 +5,13 @@ namespace JuloUtil {
 	
 	public class StateMachine<T> {
 		public T state;
-		
 		float lastUpdateTime;
+		bool useApplicationTime;
 		
-		public StateMachine(T defaultState) {
+		public StateMachine(T defaultState, bool useApplicationTime = false) {
+			this.useApplicationTime = useApplicationTime;
 			this.state = defaultState;
-			this.lastUpdateTime = JuloTime.gameTime();
+			this.lastUpdateTime = getTime();
 		}
 		
 		public T current() {
@@ -19,7 +20,7 @@ namespace JuloUtil {
 		
 		public void trigger(T newState) {
 			//Debug.Log("Switching to " + newState);
-			this.lastUpdateTime = JuloTime.gameTime();
+			this.lastUpdateTime = getTime();
 			state = newState;
 		}
 		
@@ -33,11 +34,18 @@ namespace JuloUtil {
 		}
 		
 		public float ellapsed() {
-			return JuloTime.gameTimeSince(this.lastUpdateTime);
+			return getTimeSince(lastUpdateTime);
 		}
 		
 		public bool isOver(float timeover) {
 			return ellapsed() >= timeover;
+		}
+		
+		float getTime() {
+			return useApplicationTime ? JuloTime.applicationTime() : JuloTime.gameTime();
+		}
+		float getTimeSince(float when) {
+			return useApplicationTime ? JuloTime.applicationTimeSince(when) : JuloTime.gameTimeSince(when);
 		}
 	}
 	

@@ -10,66 +10,33 @@ using UnityEngine.UI;
 using JuloUtil;
 
 namespace TurtleIsland {
-	
-	public class Environment : MonoBehaviour, IFocusable, IFocusTarget {
-		public enum State { MENU, PLAYING, PAUSED }
-		private bool isOver = false;
-		private bool autoMenuIsPending = false;
-		private float overTime;
-		
+	public class Environment : MonoBehaviour, Behav, IFocusTarget {
 		public enum Mode { NONE, TWO_PLAYERS, ONE_PLAYER, ZERO_PLAYERS }
 		
 		[HideInInspector]
-		public State state = State.MENU;
-		private StateMachine<State> machine;
+		public InputManager inputManager;
 		
 		[HideInInspector]
-		public Level currentLevel = null;
+		public Hooks hk;
+
+		[HideInInspector]
+		public Options options;
 		
-		private TurtleIslandGame currentGame = null;
-		private bool fakeGame = false;
+		[HideInInspector]
+		public Level currentLevel;
 		
-		private FocusTarget gameTarget = new FocusTarget();
-		private float targetX = 0f;
-		private enum SelectorState { OFF, HOVER, ON }
-		private SelectorState selectorState = SelectorState.OFF;
+		TurtleIslandGame currentGame;
+		FocusTarget gameTarget;
 		
-		private Menu _menu;
-		private Menu menu {
-			get {
-				if(_menu == null)
-					_menu = JuloFind.byName<Menu>("MenuContainer", this);
-				return _menu;
-			}
-		}
-		
-		private Hooks _hk;
-		public Hooks hk {
-			get {
-				if(_hk == null) {
-					_hk = new Hooks(this);
-				}
-				return _hk;
-			}
-		}
-		
-		private Options _options;
-		public Options options {
-			get {
-				if(_options == null)
-					_options = JuloFind.byName<Options>("Options", this);
-				return _options;
-			}
-		}
-		
-		public void Start() {
-			state = State.MENU;
-			machine = new StateMachine<State>(state);
+		public void start(InputManager inputManager) {
+			this.inputManager = inputManager;
 			
+			gameTarget = new FocusTarget();
+			
+			options = JuloFind.byName<Options>("Options", this);
+			hk = new Hooks(this);
 			currentLevel = JuloFind.byName<Level>("Level");
 			currentLevel.load(this);
-			
-			menu.init(this);
 			
 			hk.replayManager.display         = hk.replayDisplay;
 			hk.replayManager.maxSize         = options.replayMaxSize;
@@ -80,19 +47,20 @@ namespace TurtleIsland {
 			
 			if(options.musicInitiallyOn) {
 				hk.musicPlayer.play();
-			} else {
-				hk.musicControl.setOn(false);
 			}
-			hk.soundsControl.setOn(options.soundsInitiallyOn);
+			
+			//hk.soundsPlayer.setOn(options.soundsInitiallyOn);
 			
 			hk.cam.target = this;
 			
-			//fakeGame = true;
-			//playGame(Mode.ZERO_PLAYERS, TurtleIsland.Medium, 3);
 		}
 		
-		public void Update() {
+		public void update() {
 			if(isPlaying()) {
+				currentGame.step();
+				hk.cam.updateCamera();
+				
+				// TODO
 				if(currentGame.activeController && Input.GetButtonDown("WeaponValue")) {
 					float rawValue = Input.GetAxisRaw("WeaponValue");
 					if(rawValue > 0) {
@@ -103,124 +71,24 @@ namespace TurtleIsland {
 						Debug.LogWarning("No se leyó ningún valor");
 					}
 				}
-				
-				currentGame.step();
-				updateSelector();
-				hk.cam.updateCamera();
-				
-				if(!isOver && currentGame.isOver()) {
-					isOver = true;
-					autoMenuIsPending = true;
-					overTime = JuloTime.gameTime();
-				} else if(autoMenuIsPending) {
-					if(JuloTime.gameTimeSince(overTime) >= options.autoMenuTime) {
-						setState(State.MENU);
-						autoMenuIsPending = false;
-					}
-				}
 			}
 		}
 		
 		public void play() {
-			// TODO right ?
-			autoMenuIsPending = false;
-			
-			if(isPlaying())
+			if(isPlaying()) {
 				clearGame();
-			
-			Vector3 pos = hk.cam.transform.position;
-			pos.x = 0f;
-			hk.cam.transform.position = pos;
-			
-			Mode mode = menu.currentMode;
-			int numCharacters = menu.getNumberOfTurtles();
-			int difficulty = menu.getDifficulty();
-			
-			fakeGame = false;
-			playGame(mode, difficulty, numCharacters);
-			
-			isOver = false;
-			setState(State.PLAYING);
-		}
-		private void setState(State newState) {
-			state = newState;
-			machine.trigger(newState);
-			
-			menu.onStateChanged();
-		}
-		public void continueGame() {
-			setState(State.PLAYING);
-			//state = State.PLAYING;
-			//menu.onStateChanged();
-		}
-		public void backToMenu() {
-			setState(State.MENU);
-			//state = State.MENU;
-			//menu.onStateChanged();
-		}
-		public bool isPlaying() {
-			return currentGame != null;
-		}
-		public bool menuIsBlocking() {
-			return isPlaying() && !currentGame.isOver() && !fakeGame;
-		}
-		
-		void OnGUI() {
-			Event e = Event.current;
-			
-			if(e.type == EventType.KeyDown) {
-				bool used = true;
-				State st = state;
-				bool confirm = menu.confirming;
-				bool editor = Application.isEditor;
-				KeyCode cod = e.keyCode; //char ch = e.character;
-				
-				if(confirm && cod == KeyCode.Escape) {
-					menu.confirmNo();
-				} else if(!confirm && (cod == KeyCode.P || cod == KeyCode.Escape)) {
-					setState(st == State.PLAYING ? (menuIsBlocking() ? State.PAUSED : State.MENU) : State.PLAYING);
-					//state = st == State.PLAYING ? (menuIsBlocking() ? State.PAUSED : State.MENU) : State.PLAYING;
-					//menu.onStateChanged();
-				} else if(cod == KeyCode.Q && e.control) {
-					Application.Quit();
-				} else if(cod == KeyCode.M) {
-					hk.musicControl.setOn(!hk.musicControl.isOn());
-				} else if(cod == KeyCode.S) {
-					hk.soundsControl.setOn(!hk.soundsControl.isOn());
-				} else if(cod == KeyCode.F11) {
-					hk.fullscreenToggle.isOn = !hk.fullscreenToggle.isOn;
-				//} else if((editor && cod == KeyCode.F2) || (!editor && cod == KeyCode.R && e.control)) {
-					// restart
-				} else if(cod == KeyCode.N && (e.control || editor) && hk.musicControl.soundSource.isPlaying()) {
-					hk.musicControl.soundSource.next();
-				} else if(cod >= KeyCode.Alpha1 && cod <= KeyCode.Alpha5 && sendToController()) {
-					int number = (int)(cod - KeyCode.Alpha1) + 1;
-					currentGame.activeController.setValue(number);
-				} else if(cod >= KeyCode.Keypad1 && cod <= KeyCode.Keypad5 && sendToController()) {
-					int number = (int)(cod - KeyCode.Keypad1) + 1;
-					currentGame.activeController.setValue(number);
-				} else if(cod == KeyCode.Tab && sendToController()) {
-					currentGame.activeController.nextWeapon();
-				} else {
-					used = false;
-					// ...
-				}
-				if(used) {
-					//Debug.Log("Using");
-					e.Use();
-				}
-			} else if(e.type == EventType.KeyUp) {
-				// ...
-			} else {
-				// ...
 			}
+			playGame(Mode.TWO_PLAYERS, 2, 3);
 		}
 		
-		private bool sendToController() {
-			return isPlaying() && currentGame.activeController != null;
+		public void playCpu() {
+			if(isPlaying()) {
+				clearGame();
+			}
+			playGame(Mode.ONE_PLAYER, 2, 3);
 		}
 		
-		private void playGame(Mode mode, int difficult, int numCharacters) {
+		void playGame(Mode mode, int difficult, int numCharacters) {
 			setControl(mode);
 			options.difficulty = difficult;
 			
@@ -230,18 +98,11 @@ namespace TurtleIsland {
 			currentGame.init();
 		}
 		
-		private void clearGame() {
-			foreach(TurtleIslandObject obj in currentGame.objects) {
-				obj.onDestroy();
-				GameObject.Destroy(obj.gameObject);
-			}
-			
-			gameTarget.blur();
-			
-			currentGame = null;
+		public bool isPlaying() {
+			return currentGame != null;
 		}
 		
-		private void setControl(Mode mode) {
+		void setControl(Mode mode) {
 			switch(mode) {
 			case Mode.TWO_PLAYERS:
 				options.leftController = hk.userController;
@@ -268,50 +129,38 @@ namespace TurtleIsland {
 			}
 		}
 		
-		private void updateSelector() {
-			Vector2 mousePos = Input.mousePosition;
+		void clearGame() {
+			foreach(TurtleIslandObject obj in currentGame.objects) {
+				obj.onDestroy();
+				GameObject.Destroy(obj.gameObject);
+			}
 			
-			RectTransform selectorRt = (RectTransform)hk.minimapSelector.transform;
+			gameTarget.blur();
 			
-			float relativeBottom = hk.minimapCamera.rect.yMin;
-			float relativeTop    = hk.minimapCamera.rect.yMax;
-			float relativeHeight = hk.minimapCamera.rect.height;
+			currentGame = null;
+		}
+		
+		/**************************/
+		
+		// TODO 
+		void OnGUI() {
+			Event e = Event.current;
+			KeyCode cod = e.keyCode;
 			
-			float bottom = Screen.height * relativeBottom;
-			float top    = Screen.height * relativeTop;
-			
-			float relativeX = mousePos.x / Screen.width;
-			float width  = relativeHeight * Screen.width * hk.mainCamera.orthographicSize / hk.minimapCamera.orthographicSize;
-			
-			selectorRt.anchorMin = new Vector2(relativeX, relativeBottom);
-			selectorRt.anchorMax = new Vector2(relativeX, relativeTop);
-			
-			selectorRt.offsetMin = new Vector2(-width / 2f, 0f);
-			selectorRt.offsetMax = new Vector2(+width / 2f, 0f);
-			
-			bool mouseInRange = mousePos.y >= bottom && mousePos.y <= top;
-			bool click = Input.GetMouseButton(0);
-			
-			if(state == State.PLAYING && !click && mouseInRange) {
-				if(selectorState != SelectorState.HOVER) {
-					selectorState = SelectorState.HOVER;
-					hk.minimapSelector.trigger("Hover");
-				}
-			} else if(state == State.PLAYING && click && (mouseInRange || selectorState == SelectorState.ON)) {
-				if(selectorState != SelectorState.ON) {
-					selectorState = SelectorState.ON;
-					hk.minimapSelector.trigger("On");
-				}
-				float factor = 2f * hk.minimapCamera.orthographicSize / relativeHeight;
-				float worldX = factor * (mousePos.x - Screen.width / 2f) / Screen.height;
-				targetX = worldX;
-			} else {
-				if(selectorState != SelectorState.OFF) {
-					selectorState = SelectorState.OFF;
-					hk.minimapSelector.trigger("Off");
+			if(e.type == EventType.KeyDown) {
+				if(cod >= KeyCode.Alpha1 && cod <= KeyCode.Alpha5) {
+					int number = (int)(cod - KeyCode.Alpha1) + 1;
+					if(currentGame != null && currentGame.activeController != null)
+						currentGame.activeController.setValue(number);
+				} else if(cod >= KeyCode.Keypad1 && cod <= KeyCode.Keypad5) {
+					int number = (int)(cod - KeyCode.Keypad1) + 1;
+					if(currentGame != null && currentGame.activeController != null)
+						currentGame.activeController.setValue(number);
 				}
 			}
 		}
+		
+		/**************************/
 		
 		public void focusObject(Component obj) {
 			gameTarget.focusObject(obj);
@@ -325,12 +174,13 @@ namespace TurtleIsland {
 		public void blur() {
 			gameTarget.blur();
 		}
-		
 		public bool isFocused() {
-			return selectorState == SelectorState.ON || gameTarget.isFocused();
+			return gameTarget.isFocused();
+			//return selectorState == SelectorState.ON || gameTarget.isFocused();
 		}
 		public Vector3 getFocusPosition() {
-			return selectorState == SelectorState.ON ? new Vector3(targetX, 0f, 0f) : gameTarget.getFocusPosition();
+			return gameTarget.getFocusPosition();
+			//return selectorState == SelectorState.ON ? new Vector3(targetX, 0f, 0f) : gameTarget.getFocusPosition();
 		}
 	}
 }

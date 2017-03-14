@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 using JuloUtil;
 
-namespace JuloAudio{
+namespace JuloAudio {
 	
 	public class VolumeControl : MonoBehaviour {
 		public SoundSource soundSource;

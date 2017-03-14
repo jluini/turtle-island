@@ -20,6 +20,9 @@ namespace JuloUtil {
 		public static bool inRange(float x, float minValue, float maxValue) {
 			return x >= minValue && x <= maxValue;
 		}
+		public static int sign(float x) {
+			return x < 0 ? -1 : (x > 0 ? +1 : 0);
+		}
 		/**
 		 * Returns a unit vector with the specified angle (in degrees).
 		 */

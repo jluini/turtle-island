@@ -15,15 +15,15 @@ namespace TurtleIsland {
 		public Image replayDisplay;
 		public SmartCamera cam;
 		
-		public Transform menuContainer;
+		//public Transform menuContainer;
 		public OcultableDisplay displayContainer;
 		
 		public SoundSource musicPlayer;
 		public SoundSource soundsPlayer;
 		
-		public VolumeControl musicControl;
-		public VolumeControl soundsControl;
-		public Toggle fullscreenToggle;
+		//public VolumeControl musicControl;
+		//public VolumeControl soundsControl;
+		//public Toggle fullscreenToggle;
 		
 		public Dictionary<int, TeamDisplay> teamDisplays;
 		public TextDisplay mainTimeDisplay;
@@ -42,18 +42,18 @@ namespace TurtleIsland {
 			replayDisplay = JuloFind.byName<Image>("ReplayDisplay");
 			cam = mainCamera.GetComponent<SmartCamera>();
 			
-			menuContainer = JuloFind.byName<Transform>("Menu", env);
+			//menuContainer = JuloFind.byName<Transform>("Menu", env);
 			displayContainer = JuloFind.byName<OcultableDisplay>("Display", env);
 			
 			musicPlayer = JuloFind.byName<SoundSource>("MusicPlayer", env);
-			musicControl = JuloFind.byName<VolumeControl>("MusicControl", env);
-			musicControl.soundSource = musicPlayer;
+			//musicControl = JuloFind.byName<VolumeControl>("MusicControl", env);
+			//musicControl.soundSource = musicPlayer;
 			
 			soundsPlayer = JuloFind.byName<SoundSource>("SoundsPlayer", env);
-			soundsControl = JuloFind.byName<VolumeControl>("SoundsControl", env);
-			soundsControl.soundSource = soundsPlayer;
+			//soundsControl = JuloFind.byName<VolumeControl>("SoundsControl", env);
+			//soundsControl.soundSource = soundsPlayer;
 			
-			fullscreenToggle = JuloFind.byName<Toggle>("FullscreenToggle", menuContainer);
+			//fullscreenToggle = JuloFind.byName<Toggle>("FullscreenToggle", menuContainer);
 			
 			teamDisplays = new Dictionary<int, TeamDisplay>();
 			teamDisplays.Add(TurtleIsland.LeftTeamId,  JuloFind.byName<TeamDisplay>("LeftTeamDisplay",  displayContainer));

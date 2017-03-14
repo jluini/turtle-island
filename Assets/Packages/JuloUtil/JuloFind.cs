@@ -120,7 +120,23 @@ namespace JuloUtil {
 			}
 			return null;
 		}
-		
+		public static List<T> allDescendants<T>(Component context) where T : Component {
+			List<T> ret = new List<T>();
+			
+			foreach(Transform t in context.transform) {
+				//GameObject obj = t.gameObject;
+				T comp = t.GetComponent<T>();
+				if(comp != null) {
+					ret.Add(comp);
+				} else {
+					foreach(T nested in allDescendants<T>(t)) {
+						ret.Add(nested);
+					}
+				}
+			}
+			
+			return ret;
+		}
 		/*
 		public static GameObject getChild(string name, Transform parent) {
 			Transform tr = parent.Find(name);

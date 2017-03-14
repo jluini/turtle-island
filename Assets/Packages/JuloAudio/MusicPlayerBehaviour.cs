@@ -17,15 +17,6 @@ namespace JuloAudio {
 		private bool[] clipFlags;
 		private int numSongs;
 		
-		private AudioSource _audioSource;
-		private AudioSource audioSource {
-			get {
-				if(_audioSource == null)
-					_audioSource = GetComponent<AudioSource>();
-				return _audioSource;
-			}
-		}
-		
 		private enum State { STOPPED, PLAYING, OVER, PAUSED };
 		private State state = State.STOPPED;
 		
@@ -33,7 +24,7 @@ namespace JuloAudio {
 		public int lastIndex;
 		private int songsPlayed;
 		
-		public override void init() {
+		public override void onInit() {
 			numSongs = clips.Length;
 			if(numSongs < 1)
 				return;
@@ -169,7 +160,12 @@ namespace JuloAudio {
 			}
 		}
 		
-		public override void setVolume(float volume) { audioSource.volume = volume; }
+		public override void onSwitch() {
+			if(isOn)
+				play();
+			else
+				pause();
+		}
 		
 		public override void playClip(AudioClip clip, float volume = 1f) { }
 		

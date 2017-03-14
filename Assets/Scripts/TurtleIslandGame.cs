@@ -9,7 +9,7 @@ using JuloGame;
 
 namespace TurtleIsland {
 	
-	public class TurtleIslandGame : Game<TurtleIslandObject, Options> {
+	public class TurtleIslandGame : Game<TurtleIslandObject, Options>, Behav {
 		public Environment env;
 		public Level level;
 		public TeamManager teamManager;
@@ -166,8 +166,8 @@ namespace TurtleIsland {
 					Team winner = teamManager.getSomeReadyTeam();
 					
 					if(winner != null) {
-						if(env.hk.soundsControl.isOn())
-							env.hk.soundsControl.soundSource.playClip(options.winClip, 1f);
+						//if(env.hk.soundsControl.isOn())
+						env.hk.soundsPlayer.playClip(options.winClip, 1f);
 						
 						foreach(Character c in winner) {
 							if(c.isReady()) {
@@ -177,8 +177,8 @@ namespace TurtleIsland {
 						
 						env.hk.teamDisplays[winner.id].trigger("Win");
 					} else {
-						if(env.hk.soundsControl.isOn())
-							env.hk.soundsControl.soundSource.playClip(options.drawClip, 1f);
+						//if(env.hk.soundsControl.isOn())
+						env.hk.soundsPlayer.playClip(options.drawClip, 1f);
 					}
 				}
 			} else if(machine.state == State.CELEBRATE) {
@@ -227,8 +227,8 @@ namespace TurtleIsland {
 		}
 		
 		public void sink(TurtleIslandObject obj) {
-			if(env.hk.soundsControl.isOn())
-				env.hk.soundsControl.soundSource.playClip(options.sinkClip, 1f);
+			//if(env.hk.soundsControl.isOn())
+			env.hk.soundsPlayer.playClip(options.sinkClip, 1f);
 			
 			Rigidbody2D b = obj.rb;
 			b.drag = 10;
@@ -250,8 +250,8 @@ namespace TurtleIsland {
 			
 			AudioClip shotClip = chargeTime < options.shotClipThreshold ? options.shot1Clip : options.shot2Clip;
 			
-			if(env.hk.soundsControl.isOn())
-				env.hk.soundsControl.soundSource.playClip(shotClip, 1f);
+			//if(env.hk.soundsControl.isOn())
+			env.hk.soundsPlayer.playClip(shotClip, 1f);
 			
 			machine.trigger(State.PLAY); // resets machine counter
 			playStatus = TTPlayStatus.DONE;
@@ -285,7 +285,7 @@ namespace TurtleIsland {
 			}
 		}
 		public void incrementWeaponValue() {
-			if(activeController != null && currentTeam.weaponValue < 6) {
+			if(activeController != null && currentTeam.weaponValue < 5) {
 				currentTeam.weaponValue++;
 				updateWeaponInfo();
 			//} else {
@@ -318,8 +318,8 @@ namespace TurtleIsland {
 		}
 		
 		public void addForce(ForceWeighting weighting, float forceScale, float damageScale) {
-			if(env.hk.soundsControl.isOn())
-				env.hk.soundsControl.soundSource.playClip(options.explosionClip, 1f);
+			//if(env.hk.soundsControl.isOn())
+			env.hk.soundsPlayer.playClip(options.explosionClip, 1f);
 			
 			float maxMagnitude = 0;
 			Character maxMagnitudeChar = null;
@@ -450,5 +450,8 @@ namespace TurtleIsland {
 			env.hk.teamDisplays[TurtleIsland.LeftTeamId].setWeapon(level.weapons[leftTeam.weaponIndex], leftTeam.weaponValue);
 			env.hk.teamDisplays[TurtleIsland.RightTeamId].setWeapon(level.weapons[rightTeam.weaponIndex], rightTeam.weaponValue);
 		}
+		
+		public void start(InputManager inputManager) {}
+		public void update() {}
 	}
 }

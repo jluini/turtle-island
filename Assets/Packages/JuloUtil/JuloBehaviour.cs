@@ -4,6 +4,7 @@ using System;
 using UnityEngine;
 
 namespace JuloUtil {
+	
 	public class JuloBehaviour : MonoBehaviour {
 		public bool isActive  () {
 			try {
@@ -17,5 +18,14 @@ namespace JuloUtil {
 		}
 		public void activate  () { gameObject.SetActive(true);   }
 		public void deactivate() { gameObject.SetActive(false);  }
+	}
+	
+	
+	public interface Behav {
+		void start(InputManager inputManager);
+		void update();
+	}
+	public interface Animatable {
+		void trigger(string newState);
 	}
 }
