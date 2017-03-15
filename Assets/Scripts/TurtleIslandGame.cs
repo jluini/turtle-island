@@ -234,6 +234,12 @@ namespace TurtleIsland {
 			b.drag = 10;
 			b.angularDrag = 10;
 		}
+		public void passTurn() {
+			if(machine.state != State.PLAY || playStatus != TTPlayStatus.PREPARE)
+				throw new ApplicationException("Invalid call of passTurn()");
+			
+			endTurn();
+		}
 		
 		public void charge() {
 			if(machine.state != State.PLAY || playStatus != TTPlayStatus.PREPARE)

@@ -15,6 +15,10 @@ public class Main : MonoBehaviour {
 	
 	MenuSystem menuSystem;
 	
+	VolumeItem musicButton;
+	VolumeItem soundsButton;
+	SwitchItem fullscreenButton;
+	
 	void Start () {
 		machine = new StateMachine<State>(State.INIT);
 		
@@ -27,20 +31,37 @@ public class Main : MonoBehaviour {
 		environment.start(inputManager);
 		
 		// TODO!!!
-		VolumeItem musicButton = JuloFind.byName<VolumeItem>("MusicButton", menuSystem);
+		musicButton = JuloFind.byName<VolumeItem>("MusicButton", menuSystem);
 		musicButton.soundSource = environment.hk.musicPlayer;
 		
-		VolumeItem soundsButton = JuloFind.byName<VolumeItem>("SoundsButton", menuSystem);
+		soundsButton = JuloFind.byName<VolumeItem>("SoundsButton", menuSystem);
 		soundsButton.soundSource = environment.hk.soundsPlayer;
+		
+		fullscreenButton = JuloFind.byName<SwitchItem>("FullscreenButton", menuSystem);
 	}
 	
 	void Update () {
+		if(inputManager.isDownKey("m")) {
+			musicButton.click(menuSystem);
+		}
+		if(inputManager.isDownKey("s")) {
+			soundsButton.click(menuSystem);
+		}
+		if(inputManager.isDownKey("f11")) {
+			fullscreenButton.click(menuSystem);
+		}
+		bool control = inputManager.isKey("left ctrl") || inputManager.isKey("right ctrl");
+		bool editor = Application.isEditor;
+		if(inputManager.isDownKey("n") && (control || editor) && environment.hk.musicPlayer.isPlaying()) {
+			environment.hk.musicPlayer.next();
+		}
 		if(machine.state == State.INIT) {
 			if(machine.triggerIfEllapsed(State.MENU, 0.1f)) {
 				menuSystem.open();
 			}
 		} else if(machine.state == State.MENU) {
 			menuSystem.update();
+			// TODO improve this!
 			inputManager.inputEnabled = false;
 			environment.update();
 			inputManager.inputEnabled = true;
@@ -64,7 +85,7 @@ public class Main : MonoBehaviour {
 	
 	public void pause() {
 		//stopTime();
-		menuSystem.open();
+		menuSystem.open("PauseMenu");
 		machine.trigger(State.MENU);
 	}
 	

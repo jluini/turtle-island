@@ -25,22 +25,27 @@ namespace TurtleIsland {
 		public override void step() {
 			float hAxis = game.env.inputManager.getAxis("Horizontal");
 			float vAxis = game.env.inputManager.getAxis("Vertical");
-			float fAxis = game.env.inputManager.getAxis("Fire");
+			bool fireDown = game.env.inputManager.isDownAny("Fire");
+			float fireValue = game.env.inputManager.getAxis("Fire");
 			
-			if(status == TTPlayStatus.PREPARE && fAxis != 0f) {
+			bool passDown = game.env.inputManager.isDownAny("Pass");
+			
+			if(status == TTPlayStatus.PREPARE && fireDown) {
 				game.charge();
 				status = TTPlayStatus.CHARGE;
-			} else if(status == TTPlayStatus.CHARGE && fAxis == 0f) {
+			} else if(status == TTPlayStatus.PREPARE && passDown) {
+				game.passTurn();
+				status = TTPlayStatus.DONE;
+			} else if(status == TTPlayStatus.CHARGE && fireValue == 0f) {
 				game.discharge();
 				status = TTPlayStatus.DONE;
-			}
-			
-			if(status != TTPlayStatus.CHARGE && hAxis != 0f) {
-				game.walk(hAxis);
-			}
-			
-			if(status != TTPlayStatus.DONE && vAxis != 0f) {
-				game.moveTarget(vAxis);
+			} else {
+				if(status != TTPlayStatus.CHARGE && hAxis != 0f) {
+					game.walk(hAxis);
+				}
+				if(status != TTPlayStatus.DONE && vAxis != 0f) {
+					game.moveTarget(vAxis);
+				}
 			}
 		}
 		

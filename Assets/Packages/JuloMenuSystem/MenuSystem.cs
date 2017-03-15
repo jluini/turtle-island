@@ -68,9 +68,27 @@ namespace JuloMenuSystem {
 		}
 		
 		public void open() {
+			open(0);
+		}
+		public void open(string menuName) {
+			int index = -1;
+			for(int m = 0; m < numMenus; m++) {
+				Menu thisMenu = menus[m];
+				if(thisMenu.name == menuName) {
+					if(index >= 0)
+						throw new ApplicationException("Found twice");
+					index = m;
+				}
+			}
+			if(index < 0)
+				throw new ApplicationException("Menu not found");
+			
+			open(index);
+		}
+		void open(int index) {
 			navigation.Clear();
 			
-			currentMenuIndex = 0;
+			currentMenuIndex = index;
 			currentMenu = menus[currentMenuIndex];
 			currentItemIndex = currentMenu.defaultIndex;
 			currentItem = currentMenu.items[currentItemIndex];
@@ -122,17 +140,27 @@ namespace JuloMenuSystem {
 				if(value != 0f) {
 					bool direction = value < 0f;
 					
-					if(direction && currentItemIndex < currentMenu.numItems - 1) {
-						switchToItem(currentItemIndex + 1);
-					} else if(!direction && currentItemIndex > 0) {
-						switchToItem(currentItemIndex - 1);
+					if(direction) {
+						int newIndex = currentItemIndex + 1;
+						if(newIndex >= currentMenu.numItems)
+							newIndex -= currentMenu.numItems;
+						switchToItem(newIndex);
+					} else if(!direction) {
+						int newIndex = currentItemIndex - 1;
+						if(newIndex < 0)
+							newIndex += currentMenu.numItems;
+						switchToItem(newIndex);
 					}
 				} else {
 					Debug.Log("Raro");
 				}
+			} else if(inputManager.isDownKey("home") || inputManager.isDownKey("page up")) {
+				switchToItem(0);
+			} else if(inputManager.isDownKey("end") || inputManager.isDownKey("page down")) {
+				switchToItem(currentMenu.numItems - 1);
 			} else if(inputManager.mouseIsMoving()) {
 				int opt = getMouseItemIndex();
-				if(opt >= 0 && opt != currentItemIndex) {
+				if(opt >= 0) {
 					switchToItem(opt);
 				}
 			}
@@ -150,8 +178,7 @@ namespace JuloMenuSystem {
 			}
 		}
 		
-		public void openMenu(Menu menu) {
-			// TODO remove this ?
+		int getMenuIndex(Menu menu) {
 			int index = -1;
 			for(int m = 0; m < numMenus; m++) {
 				Menu thisMenu = menus[m];
@@ -163,6 +190,13 @@ namespace JuloMenuSystem {
 			}
 			if(index < 0)
 				throw new ApplicationException("Menu not found");
+			
+			return index;
+		}
+		
+		public void openMenu(Menu menu) {
+			// TODO remove this ?
+			int index = getMenuIndex(menu);
 			
 			navigation.Push(new MenuEntry(currentMenuIndex, currentItemIndex));
 			switchToMenu(index);
@@ -191,6 +225,10 @@ namespace JuloMenuSystem {
 		}
 		
 		void switchToItem(int newIndex) {
+			if(newIndex == currentItemIndex) {
+				return;
+			}
+			
 			Item prevItem = currentItem;
 			currentItemIndex = newIndex;
 			currentItem = currentMenu.items[newIndex];

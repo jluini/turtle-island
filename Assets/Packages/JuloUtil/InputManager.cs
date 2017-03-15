@@ -86,6 +86,14 @@ namespace JuloUtil {
 			return whoIs;
 		}
 		
+		public bool isKey(string keyName) {
+			return Input.GetKey(keyName);
+		}
+		
+		public bool isDownKey(string keyName) {
+			return Input.GetKeyDown(keyName);
+		}
+		
 		public bool isDown(string button, int player) {
 			if(!inputEnabled) {
 				return false;

@@ -85,12 +85,12 @@ namespace TurtleIsland {
 			if(isPlaying()) {
 				clearGame();
 			}
-			playGame(Mode.ONE_PLAYER, 2, 3);
+			playGame(Mode.ONE_PLAYER, TurtleIsland.Hard, 3);
 		}
 		
-		void playGame(Mode mode, int difficult, int numCharacters) {
+		void playGame(Mode mode, int difficulty, int numCharacters) {
 			setControl(mode);
-			options.difficulty = difficult;
+			options.difficulty = difficulty;
 			
 			options.numberOfTurtles = numCharacters;
 			
