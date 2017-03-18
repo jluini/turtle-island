@@ -12,15 +12,6 @@ namespace TurtleIsland {
 		public int minimumTurtles;
 		public int maximumTurtles;
 		
-		private Weapon[] _weapons;
-		public Weapon[] weapons {
-			get {
-				if(!modelsLoaded)
-					throw new ApplicationException("Unloaded models");
-				return _weapons;
-			}
-		}
-		
 		private Transform _characterContainer;
 		public Transform characterContainer {
 			get {
@@ -28,16 +19,6 @@ namespace TurtleIsland {
 					_characterContainer = JuloFind.byName<Transform>("Characters", this);
 				}
 				return _characterContainer;
-			}
-		}
-		
-		private Transform _weaponContainer;
-		public Transform weaponContainer {
-			get {
-				if(_weaponContainer == null) {
-					_weaponContainer = JuloFind.byName<Transform>("Weapons", this);
-				}
-				return _weaponContainer;
 			}
 		}
 		
@@ -81,8 +62,8 @@ namespace TurtleIsland {
 		private Environment env = null;
 		
 		private bool modelsLoaded = false;
-		private Character[] leftModels;
-		private Character[] rightModels;
+		private Transform[] leftModels;
+		private Transform[] rightModels;
 		
 		public void load(Environment env) {
 			this.env = env;
@@ -92,86 +73,62 @@ namespace TurtleIsland {
 			
 			loadModels();
 		}
-		public TurtleIslandGame newGame(Options opt) {
+		public TurtleIslandGame newGame(/*Options opt*/) {
 			if(!modelsLoaded)
 				throw new ApplicationException("Unloaded models");
 			
-			int numTurtles = opt.numberOfTurtles;
-			int numClones = opt.numberOfClones;
+			int numTurtles = env.options.numberOfTurtles;
+			int numClones = env.options.numberOfClones;
 					
 			TurtleIslandGame ret = new TurtleIslandGame(env, this, numTurtles * numClones);
 			
 			for(int k = 0; k < numClones; k++) {
 				for(int i = 0; i < numTurtles; i++) {
-					Character lChar = getClone(leftModels[i]);
+					Character lChar = getClone(leftModels[i], TurtleIsland.LeftTeamId);
+					lChar.display = newLifeDisplay();
 					ret.addCharacter(lChar);
-					Character rChar = getClone(rightModels[i]);
+					
+					Character rChar = getClone(rightModels[i], TurtleIsland.RightTeamId);
+					rChar.display = newLifeDisplay();
 					ret.addCharacter(rChar);
+					
 					rChar.flip();
 				}
 			}
 			
 			return ret;
 		}
-		public Weapon addNewWeapon(
-				TurtleIslandGame game,
-				int weaponIndex,
-				int weaponValue,
-				Vector2 position,
-				Vector2 direction,
-				float shotTime
-		) {
-			Weapon model = weapons[weaponIndex];
-			Weapon w = UnityEngine.Object.Instantiate(model);
-			
-			w.transform.SetParent(weaponContainer, false);
-			
-			game.addObject(w);
-			
-			w.activate();
-			w.init(game);
-			
-			Vector3 position3D = new Vector3(position.x, position.y, model.transform.position.z);
-			w.go(weaponValue, position3D, direction, shotTime);
-			
-			return w;
+		
+		LifeDisplay newLifeDisplay() {
+			return UnityEngine.Object.Instantiate(env.options.lifeDisplayPrefab);
 		}
-		private Character getClone(Character model) {
-			Character ret = UnityEngine.Object.Instantiate(model);
+		
+		private Character getClone(Transform model, int team) {
+			Character ret = UnityEngine.Object.Instantiate(env.options.characterPrefab);
+			ret.teamId = team;
+			ret.life = env.options.initialTurtleLife;
 			ret.transform.SetParent(characterContainer.transform, false);
+			ret.transform.position = model.position;
 			
 			return ret;
 		}
 		
 		private void loadModels() {
-			leftModels  = new Character[maximumTurtles];
-			rightModels = new Character[maximumTurtles];
+			leftModels  = new Transform[maximumTurtles];
+			rightModels = new Transform[maximumTurtles];
 			
 			for(int i = 0; i < maximumTurtles; i++) {
 				leftModels[i]  = getModel(TurtleIsland.LeftTeamId,  TurtleIsland.LeftTeamName,  i);
 				rightModels[i] = getModel(TurtleIsland.RightTeamId, TurtleIsland.RightTeamName, i);
 			}
 			
-			List<Weapon> weapons = new List<Weapon>();
-			foreach(Transform child in weaponContainer) {
-				Weapon w = child.GetComponent<Weapon>();
-				if(child.gameObject.activeSelf && w != null) {
-					weapons.Add(w);
-					w.deactivate();
-				}
-			}
-			
-			_weapons = weapons.ToArray();
-			
 			modelsLoaded = true;
 		}
 		
-		private Character getModel(int teamId, string teamName, int modelIndex) {
+		Transform getModel(int teamId, string teamName, int modelIndex) {
 			string name = teamName + (modelIndex + 1).ToString();
-			Character ret = JuloFind.byName<Character>(name, characterContainer);
-			ret.teamId = teamId;
-			ret.life = env.options.initialTurtleLife;
-			ret.deactivate();
+			Transform ret = JuloFind.byName<Transform>(name, characterContainer);
+			//ret.teamId = teamId;
 			return ret;
 		}
 	}

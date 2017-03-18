@@ -22,6 +22,9 @@ namespace TurtleIsland {
 		[HideInInspector]
 		public bool isSkeleton = false;
 		
+		public LifeDisplay display;
+		
+		
 		private Controller controller = null;
 		
 		private float walkForce = 0f;
@@ -72,18 +75,26 @@ namespace TurtleIsland {
 			}
 		}
 		
-		private LifeDisplay _display;
+		/*
 		public LifeDisplay display {
 			get {
-				if(_display == null)
+				if(_display == null) {
 					_display = JuloFind.byName<LifeDisplay>("Display", this);
 				return _display;
 			}
 		}
-		
+		*/
 		public override void onInit() {
+			if(display == null) {
+				throw new ApplicationException("No life display");
+			}
+			Color teamColor = game.getColorForTeam(teamId);
+			
+			display.GetComponent<FollowDisplay>().target = this.transform;
 			display.transform.SetParent(game.env.hk.displayContainer.transform, false);
-			display.init(life, game.getColorForTeam(teamId));
+			display.init(life, teamColor);
+			
+			JuloFind.byName<SpriteRenderer>("MinimapRenderer", this).color = teamColor;
 			
 			target.hide();
 		}

@@ -264,7 +264,7 @@ namespace TurtleIsland {
 			
 			currentCharacter.discharge();
 			
-			Weapon w = level.addNewWeapon(
+			Weapon w = env.addNewWeapon(
 				this,
 				currentTeam.weaponIndex,
 				currentTeam.weaponValue,
@@ -310,7 +310,7 @@ namespace TurtleIsland {
 		public void nextWeapon() {
 			if(activeController != null) {
 				currentTeam.setWeapon(
-					(currentTeam.weaponIndex + 1) % env.currentLevel.weapons.Length,
+					(currentTeam.weaponIndex + 1) % env.weapons.Length,
 					options.initialWeaponValue
 				);
 				updateWeaponInfo();
@@ -453,8 +453,8 @@ namespace TurtleIsland {
 			env.hk.teamDisplays[currentTeam.id].trigger("Stop");
 		}
 		private void updateWeaponInfo() {
-			env.hk.teamDisplays[TurtleIsland.LeftTeamId].setWeapon(level.weapons[leftTeam.weaponIndex], leftTeam.weaponValue);
-			env.hk.teamDisplays[TurtleIsland.RightTeamId].setWeapon(level.weapons[rightTeam.weaponIndex], rightTeam.weaponValue);
+			env.hk.teamDisplays[TurtleIsland.LeftTeamId].setWeapon(env.weapons[leftTeam.weaponIndex], leftTeam.weaponValue);
+			env.hk.teamDisplays[TurtleIsland.RightTeamId].setWeapon(env.weapons[rightTeam.weaponIndex], rightTeam.weaponValue);
 		}
 		
 		public void start(InputManager inputManager) {}

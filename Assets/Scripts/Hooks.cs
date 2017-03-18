@@ -42,18 +42,10 @@ namespace TurtleIsland {
 			replayDisplay = JuloFind.byName<Image>("ReplayDisplay");
 			cam = mainCamera.GetComponent<SmartCamera>();
 			
-			//menuContainer = JuloFind.byName<Transform>("Menu", env);
-			displayContainer = JuloFind.byName<OcultableDisplay>("Display", env);
+			displayContainer = JuloFind.byName<OcultableDisplay>("ControlsDisplay", env);
 			
-			musicPlayer = JuloFind.byName<SoundSource>("MusicPlayer", env);
-			//musicControl = JuloFind.byName<VolumeControl>("MusicControl", env);
-			//musicControl.soundSource = musicPlayer;
-			
-			soundsPlayer = JuloFind.byName<SoundSource>("SoundsPlayer", env);
-			//soundsControl = JuloFind.byName<VolumeControl>("SoundsControl", env);
-			//soundsControl.soundSource = soundsPlayer;
-			
-			//fullscreenToggle = JuloFind.byName<Toggle>("FullscreenToggle", menuContainer);
+			musicPlayer = JuloFind.byName<SoundSource>("MusicPlayer");
+			soundsPlayer = JuloFind.byName<SoundSource>("SoundsPlayer");
 			
 			teamDisplays = new Dictionary<int, TeamDisplay>();
 			teamDisplays.Add(TurtleIsland.LeftTeamId,  JuloFind.byName<TeamDisplay>("LeftTeamDisplay",  displayContainer));

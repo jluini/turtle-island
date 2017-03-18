@@ -28,6 +28,9 @@ namespace TurtleIsland {
 		TurtleIslandGame currentGame;
 		FocusTarget gameTarget;
 		
+		public Weapon[] weapons;
+		Transform weaponContainer;
+		
 		public void start(InputManager inputManager) {
 			this.inputManager = inputManager;
 			
@@ -53,6 +56,7 @@ namespace TurtleIsland {
 			
 			hk.cam.target = this;
 			
+			loadWeapons();
 		}
 		
 		public void update() {
@@ -94,7 +98,7 @@ namespace TurtleIsland {
 			
 			options.numberOfTurtles = numCharacters;
 			
-			currentGame = currentLevel.newGame(options);
+			currentGame = currentLevel.newGame(/*options*/);
 			currentGame.init();
 		}
 		
@@ -181,6 +185,46 @@ namespace TurtleIsland {
 		public Vector3 getFocusPosition() {
 			return gameTarget.getFocusPosition();
 			//return selectorState == SelectorState.ON ? new Vector3(targetX, 0f, 0f) : gameTarget.getFocusPosition();
+		}
+		
+		void loadWeapons() {
+			weaponContainer = JuloFind.byName<Transform>("Weapons", this);
+			
+			List<Weapon> weaponList = new List<Weapon>();
+			
+			foreach(Transform child in weaponContainer) {
+				Weapon w = child.GetComponent<Weapon>();
+				if(child.gameObject.activeSelf && w != null) {
+					weaponList.Add(w);
+					w.deactivate();
+				}
+			}
+			
+			weapons = weaponList.ToArray();
+		}
+		
+		public Weapon addNewWeapon(
+				TurtleIslandGame game,
+				int weaponIndex,
+				int weaponValue,
+				Vector2 position,
+				Vector2 direction,
+				float shotTime
+		) {
+			Weapon model = weapons[weaponIndex];
+			Weapon w = UnityEngine.Object.Instantiate(model);
+			
+			w.transform.SetParent(weaponContainer, false);
+			
+			game.addObject(w);
+			
+			w.activate();
+			w.init(game);
+			
+			Vector3 position3D = new Vector3(position.x, position.y, model.transform.position.z);
+			w.go(weaponValue, position3D, direction, shotTime);
+			
+			return w;
 		}
 	}
 }

@@ -6,6 +6,9 @@ using JuloGame;
 namespace TurtleIsland {
 	
 	public class Options : GameOptions {
+		public LifeDisplay lifeDisplayPrefab;
+		public Character characterPrefab;
+		
 		[Header("Game options")]
 		public int numberOfTurtles = 3;
 		public int numberOfClones = 1;

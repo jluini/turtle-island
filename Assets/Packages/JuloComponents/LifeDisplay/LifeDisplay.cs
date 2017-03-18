@@ -85,6 +85,10 @@ public class LifeDisplay : JuloBehaviour {
 		life = life - damage;
 	}
 	public void LateUpdate() {
+		if(machine == null) {
+			Debug.Log("Rarisimo");
+			return;
+		}
 		if(machine.state == LDState.APPLY_DAMAGE) {
 			if(machine.triggerIfEllapsed(LDState.IDLE, 1f)) {
 				damageDisplay.gameObject.SetActive(false);

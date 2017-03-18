@@ -29,6 +29,8 @@ public class Main : MonoBehaviour {
 		environment.start(inputManager);
 		
 		menuSystem = JuloFind.byName<MenuSystem>("MenuContainer");
+		menuSystem.gameObject.SetActive(true);
+		
 		// TODO!!!
 		musicButton = JuloFind.byName<VolumeItem>("MusicButton", menuSystem);
 		musicButton.soundSource = environment.hk.musicPlayer;
