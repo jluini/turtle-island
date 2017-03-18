@@ -118,6 +118,8 @@ namespace JuloMenuSystem {
 			//setCursorPos(newPos);
 			cursor.setPosition(newPos);
 			
+			// Debug.Log("Update: " + Time.frameCount + " --- " + inputManager.getAxis("Vertical"));
+			
 			if(inputManager.isDownAny("Start")) {
 				if(back != null) {
 					back.Invoke();
@@ -144,6 +146,7 @@ namespace JuloMenuSystem {
 			} else if(inputManager.isDownAny("Back")) {
 				goBack();
 			} else if(inputManager.isDownAny("Vertical")) {
+				//Debug.Log("Moving cursor");
 				float value = inputManager.getAxis("Vertical", inputManager.who());
 				
 				if(value != 0f) {

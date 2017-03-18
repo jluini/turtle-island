@@ -81,14 +81,17 @@ public class Main : MonoBehaviour {
 	}
 	
 	public void play() {
-		menuSystem.close();
-		machine.trigger(State.GAME);
-		
+		resume();
 		environment.play();
 	}
 	
+	public void playCpu() {
+		resume();
+		environment.playCpu();
+	}
+	
 	public void pause() {
-		//stopTime();
+		stopTime();
 		
 		int index;
 		
@@ -105,16 +108,9 @@ public class Main : MonoBehaviour {
 	}
 	
 	public void resume() {
-		//startTime();
+		startTime();
 		menuSystem.close();
 		machine.trigger(State.GAME);
-	}
-	
-	public void playCpu() {
-		menuSystem.close();
-		machine.trigger(State.GAME);
-		
-		environment.playCpu();
 	}
 	
 	public void quitGame() {

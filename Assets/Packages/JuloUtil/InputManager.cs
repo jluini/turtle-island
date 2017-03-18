@@ -51,6 +51,7 @@ namespace JuloUtil {
 			} else if(button == "Vertical") {
 				return verticalAxis.getValue(player);
 			} else {
+				// TODO replace by GetAxis ?
 				return getAxisRaw(button, player);
 			}
 		}
@@ -132,7 +133,7 @@ namespace JuloUtil {
 		}
 		
 		public float getAxisRaw(string button, int player) {
-			return Input.GetAxis(nameFor(button, player));
+			return Input.GetAxisRaw(nameFor(button, player));
 		}
 		
 		void OnGUI() {
