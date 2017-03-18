@@ -13,9 +13,6 @@ namespace JuloMenuSystem {
 	public class MenuSystem : MonoBehaviour, Behav {
 		public float cursorVelocityFactor = 0.2f;
 		
-		//public Sprite yesSprite;
-		//public Sprite noSprite;
-		
 		public UnityEvent back;
 		
 		// TODO remove from here
@@ -72,7 +69,8 @@ namespace JuloMenuSystem {
 		public void open() {
 			open(0);
 		}
-		public void open(string menuName) {
+		
+		public void open(string menuName, int optionIndex = -1) {
 			int index = -1;
 			for(int m = 0; m < numMenus; m++) {
 				Menu thisMenu = menus[m];
@@ -85,14 +83,16 @@ namespace JuloMenuSystem {
 			if(index < 0)
 				throw new ApplicationException("Menu not found");
 			
-			open(index);
+			open(index, optionIndex);
 		}
-		void open(int index) {
+		void open(int itemIndex, int optionIndex = -1) {
 			navigation.Clear();
 			
-			currentMenuIndex = index;
+			currentMenuIndex = itemIndex;
 			currentMenu = menus[currentMenuIndex];
-			currentItemIndex = currentMenu.defaultIndex;
+			if(optionIndex < 0)
+				optionIndex = currentMenu.defaultIndex;
+			currentItemIndex = optionIndex;
 			currentItem = currentMenu.items[currentItemIndex];
 			
 			overlay.SetActive(true);
@@ -150,23 +150,37 @@ namespace JuloMenuSystem {
 					bool direction = value < 0f;
 					
 					if(direction) {
-						int newIndex = currentItemIndex + 1;
-						if(newIndex >= currentMenu.numItems)
-							newIndex -= currentMenu.numItems;
+						int newIndex = currentItemIndex;
+						bool moved = false;
+						do {
+							newIndex++;
+							if(newIndex >= currentMenu.numItems)
+								newIndex = 0;
+							if(currentMenu.items[newIndex].isEnabled())
+								moved = true;
+						} while(!moved);
+						
 						switchToItem(newIndex);
 					} else if(!direction) {
-						int newIndex = currentItemIndex - 1;
-						if(newIndex < 0)
-							newIndex += currentMenu.numItems;
+						int newIndex = currentItemIndex;
+						bool moved = false;
+						do {
+							newIndex--;
+							if(newIndex < 0)
+								newIndex = currentMenu.numItems - 1;
+							if(currentMenu.items[newIndex].gameObject.activeSelf)
+								moved = true;
+						} while(!moved);
+						
 						switchToItem(newIndex);
 					}
 				} else {
 					Debug.Log("Raro");
 				}
 			} else if(inputManager.isDownKey("home") || inputManager.isDownKey("page up")) {
-				switchToItem(0);
+				switchToFirstItem();
 			} else if(inputManager.isDownKey("end") || inputManager.isDownKey("page down")) {
-				switchToItem(currentMenu.numItems - 1);
+				switchToLastItem();
 			} else if(inputManager.mouseIsMoving()) {
 				int opt = getMouseItemIndex();
 				if(opt >= 0) {
@@ -225,12 +239,39 @@ namespace JuloMenuSystem {
 			Vector2 mousePos = inputManager.getMousePosition();
 			if(isWithin(currentMenu.GetComponent<RectTransform>(), mousePos)) {
 				for(int i = 0; i < currentMenu.numItems; i++) {
-					if(isWithin(currentMenu.items[i].GetComponent<RectTransform>(), mousePos)) {
+					Item item = currentMenu.items[i];
+					if(item.isEnabled() && isWithin(item.GetComponent<RectTransform>(), mousePos)) {
 						return i;
 					}
 				}
 			}
 			return -1;
+		}
+		
+		void switchToFirstItem() {
+			int newIndex = 0;
+			bool moved = false;
+			do {
+				if(currentMenu.items[newIndex].isEnabled())
+					moved = true;
+				else
+					newIndex++;
+			} while(!moved);
+			
+			switchToItem(newIndex);
+		}
+		
+		void switchToLastItem() {
+			int newIndex = currentMenu.numItems - 1;
+			bool moved = false;
+			do {
+				if(currentMenu.items[newIndex].isEnabled())
+					moved = true;
+				else
+					newIndex--;
+			} while(!moved);
+			
+			switchToItem(newIndex);
 		}
 		
 		void switchToItem(int newIndex) {

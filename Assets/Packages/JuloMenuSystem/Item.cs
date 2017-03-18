@@ -40,6 +40,11 @@ namespace JuloMenuSystem {
 				Debug.LogWarning("Already deselected");
 			}
 		}
+		
+		public bool isEnabled() {
+			return gameObject.activeSelf;
+		}
+		
 		void trigger(string newState) {
 			anim.SetTrigger(newState);
 		}

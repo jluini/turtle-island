@@ -17,6 +17,7 @@ public class Main : MonoBehaviour {
 	
 	VolumeItem musicButton;
 	VolumeItem soundsButton;
+	GameObject continueButton;
 	SwitchItem fullscreenButton;
 	
 	void Start () {
@@ -34,6 +35,8 @@ public class Main : MonoBehaviour {
 		
 		soundsButton = JuloFind.byName<VolumeItem>("SoundsButton", menuSystem);
 		soundsButton.soundSource = environment.hk.soundsPlayer;
+		
+		continueButton = JuloFind.byName("ContinueButton", menuSystem);
 		
 		fullscreenButton = JuloFind.byName<SwitchItem>("FullscreenButton", menuSystem);
 		
@@ -86,7 +89,18 @@ public class Main : MonoBehaviour {
 	
 	public void pause() {
 		//stopTime();
-		menuSystem.open("PauseMenu");
+		
+		int index;
+		
+		if(environment.isPlaying()) {
+			index = 0;
+			continueButton.SetActive(true);
+		} else {
+			index = 1;
+			continueButton.SetActive(false);
+		}
+		menuSystem.open("MainMenu", index);
+		//menuSystem.open("PauseMenu");
 		machine.trigger(State.MENU);
 	}
 	

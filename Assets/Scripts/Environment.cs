@@ -75,7 +75,7 @@ namespace TurtleIsland {
 		}
 		
 		public void play() {
-			if(isPlaying()) {
+			if(currentGame != null) {
 				clearGame();
 			}
 			playGame(Mode.TWO_PLAYERS, 2, 3);
@@ -99,7 +99,7 @@ namespace TurtleIsland {
 		}
 		
 		public bool isPlaying() {
-			return currentGame != null;
+			return currentGame != null && !currentGame.isOver();
 		}
 		
 		void setControl(Mode mode) {
