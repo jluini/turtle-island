@@ -16,6 +16,7 @@ namespace JuloMenuSystem {
 		}
 		
 		public abstract bool click(MenuSystem menuSystem); // { onClick.Invoke(); }
+		public virtual bool move(MenuSystem menuSystem, bool direction) { return false; }
 		public virtual void onStart() { }
 		
 		public float getPosition() {

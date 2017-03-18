@@ -24,12 +24,10 @@ public class Main : MonoBehaviour {
 		
 		inputManager = JuloFind.byName<InputManager>("InputManager");
 		
-		menuSystem = JuloFind.byName<MenuSystem>("MenuContainer");
-		menuSystem.start(inputManager);
-		
 		environment = JuloFind.byName<Environment>("TurtleIslandEnvironment");
 		environment.start(inputManager);
 		
+		menuSystem = JuloFind.byName<MenuSystem>("MenuContainer");
 		// TODO!!!
 		musicButton = JuloFind.byName<VolumeItem>("MusicButton", menuSystem);
 		musicButton.soundSource = environment.hk.musicPlayer;
@@ -38,6 +36,9 @@ public class Main : MonoBehaviour {
 		soundsButton.soundSource = environment.hk.soundsPlayer;
 		
 		fullscreenButton = JuloFind.byName<SwitchItem>("FullscreenButton", menuSystem);
+		
+		menuSystem.start(inputManager);
+		
 	}
 	
 	void Update () {
@@ -108,7 +109,7 @@ public class Main : MonoBehaviour {
 	}
 	
 	public void switchFullscreen(bool value) {
-		Debug.Log("Fullscreen switch " + (value ? "ON" : "OFF"));
+		//Debug.Log("Fullscreen switch " + (value ? "ON" : "OFF"));
 		Screen.fullScreen = value;
 	}
 	

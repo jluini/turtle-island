@@ -13,8 +13,8 @@ namespace JuloMenuSystem {
 	public class MenuSystem : MonoBehaviour, Behav {
 		public float cursorVelocityFactor = 0.2f;
 		
-		public Sprite yesSprite;
-		public Sprite noSprite;
+		//public Sprite yesSprite;
+		//public Sprite noSprite;
 		
 		public UnityEvent back;
 		
@@ -59,8 +59,10 @@ namespace JuloMenuSystem {
 			
 			this.menus = JuloFind.allDescendants<Menu>(this);
 			this.numMenus = this.menus.Count;
+			
 			for(int m = 0; m < this.numMenus; m++) {
 				Menu menu = this.menus[m];
+				menu.gameObject.SetActive(true);
 				menu.start(inputManager);
 			}
 			
@@ -122,6 +124,13 @@ namespace JuloMenuSystem {
 				}
 			} else if(inputManager.isDownAny("Fire")) {
 				fire(currentItem);
+			} else if(inputManager.isDownAny("Horizontal")) {
+				float value = inputManager.getAxis("Horizontal", inputManager.who()); 
+				if(value == 0f) {
+					Debug.Log("Raro");
+				} else {
+					currentItem.move(this, value > 0f);
+				}
 			} else if(inputManager.mouseIsDown()) {
 				int opt = getMouseItemIndex();
 				if(opt >= 0) {
@@ -201,11 +210,11 @@ namespace JuloMenuSystem {
 			navigation.Push(new MenuEntry(currentMenuIndex, currentItemIndex));
 			switchToMenu(index);
 		}
-		
+		/*
 		public Sprite getSprite(bool value) {
 			return value ? yesSprite : noSprite;
 		}
-		
+		*/
 		void fire(Item item) {
 			if(item.click(this)) {
 				soundsPlayer.playClip(menuGoClip);

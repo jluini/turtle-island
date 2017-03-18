@@ -44,11 +44,11 @@ namespace TurtleIsland {
 			hk.replayManager.lastFrameDelay  = options.replayDelay;
 			
 			hk.musicPlayer.init();
-			
+			/*
 			if(options.musicInitiallyOn) {
 				hk.musicPlayer.play();
 			}
-			
+			*/
 			//hk.soundsPlayer.setOn(options.soundsInitiallyOn);
 			
 			hk.cam.target = this;
