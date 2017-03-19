@@ -93,7 +93,14 @@ public class Main : MonoBehaviour {
 	}
 	
 	public void pause() {
-		stopTime();
+		if(machine.state != State.GAME) {
+			Debug.Log("Invalid call of pause()");
+			return;
+		}
+		
+		if(environment.isPlaying()) {
+			JuloTime.stopGame();
+		}
 		
 		int index;
 		
@@ -110,7 +117,14 @@ public class Main : MonoBehaviour {
 	}
 	
 	public void resume() {
-		startTime();
+		if(machine.state != State.MENU) {
+			Debug.LogWarning("Invalid call of resume()");
+			return;
+		}
+			
+		if(!JuloTime.gameIsRunning())
+			JuloTime.resumeGame();
+		
 		menuSystem.close();
 		machine.trigger(State.GAME);
 	}
@@ -128,16 +142,6 @@ public class Main : MonoBehaviour {
 	public void tryToCloseMenu() {
 		if(environment.isPlaying()) {
 			resume();
-			//return true;
 		}
-		//return false;
-	}
-	
-	void stopTime() {
-		Time.timeScale = 0f; 
-	}
-	
-	void startTime() {
-		Time.timeScale = 1f; 
 	}
 }

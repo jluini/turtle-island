@@ -19,6 +19,18 @@ namespace JuloUtil {
 		public static float applicationTimeSince(float stamp) {
 			return applicationTime() - stamp;
 		}
+		
+		public static bool gameIsRunning() {
+			return Time.timeScale > 0f;
+		}
+		
+		public static void resumeGame() {
+			Time.timeScale = 1f;
+		}
+		
+		public static void stopGame() {
+			Time.timeScale = 0f;
+		}
 	}
 	
 }

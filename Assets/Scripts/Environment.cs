@@ -86,7 +86,7 @@ namespace TurtleIsland {
 		}
 		
 		public void playCpu() {
-			if(isPlaying()) {
+			if(currentGame != null) {
 				clearGame();
 			}
 			playGame(Mode.ONE_PLAYER, TurtleIsland.Hard, 3);
