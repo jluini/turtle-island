@@ -85,11 +85,11 @@ namespace TurtleIsland {
 			playGame(Mode.TWO_PLAYERS, 2, 3);
 		}
 		
-		public void playCpu() {
+		public void playCpu(int difficulty) {
 			if(currentGame != null) {
 				clearGame();
 			}
-			playGame(Mode.ONE_PLAYER, TurtleIsland.Hard, 3);
+			playGame(Mode.ONE_PLAYER, difficulty, 3);
 		}
 		
 		void playGame(Mode mode, int difficulty, int numCharacters) {

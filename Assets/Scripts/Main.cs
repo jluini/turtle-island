@@ -87,9 +87,14 @@ public class Main : MonoBehaviour {
 		environment.play();
 	}
 	
-	public void playCpu() {
+	public void playCpuEasy()    { playCpu(TurtleIsland.TurtleIsland.Easy);    }
+	public void playCpuMedium()  { playCpu(TurtleIsland.TurtleIsland.Medium);  }
+	public void playCpuHard()    { playCpu(TurtleIsland.TurtleIsland.Hard);    }
+	public void playCpuMaximum() { playCpu(TurtleIsland.TurtleIsland.Maximum); }
+	
+	public void playCpu(int difficulty) {
 		resume();
-		environment.playCpu();
+		environment.playCpu(difficulty);
 	}
 	
 	public void pause() {
