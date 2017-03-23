@@ -11,7 +11,9 @@ namespace JuloMenuSystem {
 	public class Menu : MonoBehaviour, Behav {
 		public int defaultIndex = 0;
 		
+		[HideInInspector]
 		public List<Item> items;
+		[HideInInspector]
 		public int numItems;
 		
 		public void start(InputManager inputManager) {

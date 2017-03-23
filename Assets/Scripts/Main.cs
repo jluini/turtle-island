@@ -5,10 +5,10 @@ using JuloMenuSystem;
 using TurtleIsland;
 
 public class Main : MonoBehaviour {
-	InputManager inputManager;
+	[HideInInspector]
 	public Environment environment;
 	
-	//bool menuIsOpen;
+	InputManager inputManager;
 	
 	enum State { INIT, MENU, GAME }
 	StateMachine<State> machine;
@@ -55,6 +55,9 @@ public class Main : MonoBehaviour {
 		}
 		if(inputManager.isDownKey("f11")) {
 			fullscreenButton.click(menuSystem);
+		}
+		if(inputManager.isDownKey("f3")) {
+			nextLanguage();
 		}
 		bool control = inputManager.isKey("left ctrl") || inputManager.isKey("right ctrl");
 		bool editor = Application.isEditor;
@@ -147,6 +150,23 @@ public class Main : MonoBehaviour {
 	public void tryToCloseMenu() {
 		if(environment.isPlaying()) {
 			resume();
+		}
+	}
+	
+	public void setSpanish() { setLang(Language.Spanish); }
+	public void setEnglish() { setLang(Language.English); }
+	
+	void setLang(Language newLanguage) {
+		//this.language = newLanguage;
+		Internationalization.setLanguage(newLanguage);
+	}
+	
+	void nextLanguage() {
+		Language language = Internationalization.currentLanguage;
+		if(language == Language.English) {
+			setSpanish();
+		} else {
+			setEnglish();
 		}
 	}
 }

@@ -89,6 +89,22 @@ namespace JuloUtil {
 			
 			return ret;
 		}
+		public static List<T> allWithComponent<T>() where T : Component {
+			List<T> ret = new List<T>();
+			
+			foreach(GameObject o in sceneRootObjects()) {
+				//GameObject obj = t.gameObject;
+				T comp = o.GetComponent<T>();
+				if(comp != null) {
+					ret.Add(comp);
+				}
+				foreach(T nested in allDescendants<T>(o.transform)) {
+					ret.Add(nested);
+				}
+			}
+			
+			return ret;
+		}
 		private static T oneWithName<T>(string name) where T : Component {
 			List<T> all = allWithName<T>(name);
 			
@@ -128,10 +144,9 @@ namespace JuloUtil {
 				T comp = t.GetComponent<T>();
 				if(comp != null) {
 					ret.Add(comp);
-				} else {
-					foreach(T nested in allDescendants<T>(t)) {
-						ret.Add(nested);
-					}
+				}
+				foreach(T nested in allDescendants<T>(t)) {
+					ret.Add(nested);
 				}
 			}
 			
