@@ -23,7 +23,9 @@ namespace JuloUtil {
 				Debug.Log("Fail in " + transform.parent.name);
 				return;
 			}
-			textComponent.text = getText(language);
+			string t = getText(language);
+			t = t.Replace("\\n", "\n");
+			textComponent.text = t;
 			EditorUtility.SetDirty(textComponent);
 		}
 		
