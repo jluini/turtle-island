@@ -4,9 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-using UnityEditor;
-
-
 namespace JuloUtil {
 	public enum Language { English, Spanish }
 	

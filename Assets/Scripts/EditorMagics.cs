@@ -1,4 +1,5 @@
 
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 
@@ -19,3 +20,5 @@ public class EditorMagics {
 		Internationalization.setLanguage(lang);
 	}
 }
+
+#endif

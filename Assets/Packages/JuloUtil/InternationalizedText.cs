@@ -4,7 +4,9 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 namespace JuloUtil {
 	[ExecuteInEditMode]
@@ -26,7 +28,9 @@ namespace JuloUtil {
 			string t = getText(language);
 			t = t.Replace("\\n", "\n");
 			textComponent.text = t;
+			#if UNITY_EDITOR
 			EditorUtility.SetDirty(textComponent);
+			#endif
 		}
 		
 		string getText(Language language) {
