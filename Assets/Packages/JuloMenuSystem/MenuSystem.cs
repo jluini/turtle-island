@@ -134,14 +134,18 @@ namespace JuloMenuSystem {
 					currentItem.move(this, value > 0f);
 				}
 			} else if(inputManager.mouseIsDown()) {
-				int opt = getMouseItemIndex();
+				Vector2 mousePos = inputManager.getMousePosition();
+				int opt = getItemIndexForMousePosition(mousePos);
+				
 				if(opt >= 0) {
 					if(opt != currentItemIndex) {
 						Debug.Log("Raro");
 						currentItemIndex = opt;
 						currentItem = currentMenu.items[opt];
 					}
-					fire(currentItem);
+					if(currentItem.isClickable(mousePos)) {
+						fire(currentItem);
+					}
 				}
 			} else if(inputManager.isDownAny("Back")) {
 				goBack();
@@ -185,7 +189,8 @@ namespace JuloMenuSystem {
 			} else if(inputManager.isDownKey("end") || inputManager.isDownKey("page down")) {
 				switchToLastItem();
 			} else if(inputManager.mouseIsMoving()) {
-				int opt = getMouseItemIndex();
+				Vector2 mousePos = inputManager.getMousePosition();
+				int opt = getItemIndexForMousePosition(mousePos);
 				if(opt >= 0) {
 					switchToItem(opt);
 				}
@@ -227,23 +232,20 @@ namespace JuloMenuSystem {
 			navigation.Push(new MenuEntry(currentMenuIndex, currentItemIndex));
 			switchToMenu(index);
 		}
-		/*
-		public Sprite getSprite(bool value) {
-			return value ? yesSprite : noSprite;
-		}
-		*/
+		
 		void fire(Item item) {
 			if(item.click(this)) {
 				soundsPlayer.playClip(menuGoClip);
 			}
 		}
 		
-		int getMouseItemIndex() {
-			Vector2 mousePos = inputManager.getMousePosition();
-			if(isWithin(currentMenu.GetComponent<RectTransform>(), mousePos)) {
+		int getItemIndexForMousePosition(Vector2 mousePos) {
+			RectTransform menuRect = currentMenu.GetComponent<RectTransform>();
+			if(Utils.pointIsWithinRect(mousePos, menuRect)) {
 				for(int i = 0; i < currentMenu.numItems; i++) {
 					Item item = currentMenu.items[i];
-					if(item.isEnabled() && isWithin(item.GetComponent<RectTransform>(), mousePos)) {
+					RectTransform itemRect = item.GetComponent<RectTransform>();
+					if(item.isEnabled() && Utils.pointIsWithinRect(mousePos, itemRect)) {
 						return i;
 					}
 				}
@@ -306,7 +308,7 @@ namespace JuloMenuSystem {
 			cursor.setPosition(currentItem.getPosition());
 			currentItem.select();
 		}
-		
+		/*
 		bool isWithin(RectTransform rect, Vector2 point) {
 			float left = rect.position.x + rect.rect.xMin;
 			float rite = rect.position.x + rect.rect.xMax;
@@ -319,6 +321,6 @@ namespace JuloMenuSystem {
 			bool pointIn = xIn&&yIn;
 			
 			return pointIn;
-		}
+		}*/
 	}
 }

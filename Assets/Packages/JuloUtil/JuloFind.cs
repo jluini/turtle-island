@@ -11,11 +11,11 @@ namespace JuloUtil {
 		public static GameObject byName(string name, Component context = null) {
 			return byName<Transform>(name, context).gameObject;
 		}
-		public static T byName<T>(string name, Component context = null) where T : Component {
+		public static T byName<T>(string name, Component context = null, bool required = true) where T : Component {
 			if(context == null) {
-				return oneWithName<T>(name);
+				return oneWithName<T>(name, required);
 			} else {
-				return oneWithNameWithin<T>(name, context);
+				return oneWithNameWithin<T>(name, context, required);
 			}
 		}
 		public static List<T> allByName<T>(string name, Component context = null) where T : Component {
@@ -64,16 +64,20 @@ namespace JuloUtil {
 			
 			return ret;
 		}
-		private static T oneWithNameWithin<T>(string name, Component context) where T : Component {
+		private static T oneWithNameWithin<T>(string name, Component context, bool required) where T : Component {
 			List<T> all = allWithNameWithin<T>(name, context);
 			
 			if(all.Count == 0) {
-				throw new ApplicationException("No object named '" + name + "' within " + context);
+				if(required) {
+					throw new ApplicationException("No object named '" + name + "' within " + context);
+				} else {
+					return null;
+				}
 			} else if(all.Count > 1) {
 				throw new ApplicationException("More than one object named '" + name + "' within " + context);
+			} else {
+				return all[0];
 			}
-			
-			return all[0];
 		}
 		private static List<T> allWithName<T>(string name) where T : Component {
 			List<T> ret = new List<T>();
@@ -105,16 +109,21 @@ namespace JuloUtil {
 			
 			return ret;
 		}
-		private static T oneWithName<T>(string name) where T : Component {
+		private static T oneWithName<T>(string name, bool required = true) where T : Component {
 			List<T> all = allWithName<T>(name);
 			
 			if(all.Count == 0) {
-				throw new ApplicationException("No object named '" + name + "' in scene");
+				if(required) {
+					// TODO throw custom exception...
+					throw new ApplicationException("No object named '" + name + "' in scene");
+				} else {
+					return null;
+				}
 			} else if(all.Count > 1) {
 				throw new ApplicationException("More than one object named '" + name + "' in scene");
+			} else {
+				return all[0];
 			}
-			
-			return all[0];
 		}
 		public static T ancestor<T>(Component context) where T : Component {
 			T comp = context.GetComponent<T>();
