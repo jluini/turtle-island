@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 639c57e374350fe4d9b19c2a13754b88
-timeCreated: 1490424790
+guid: 719e7414a0c385a41ae0b3743cf97969
+timeCreated: 1490485744
 licenseType: Free
 TrueTypeFontImporter:
   serializedVersion: 4
@@ -10,8 +10,9 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - GoodDog Plain
-  fallbackFontReferences: []
+  - GoodDog Cool
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 639c57e374350fe4d9b19c2a13754b88, type: 3}
   customCharacters: 
   fontRenderingMode: 0
   ascentCalculationMode: 1
