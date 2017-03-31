@@ -8,6 +8,23 @@ using UnityEngine.SceneManagement;
 namespace JuloUtil {
 	
 	public class JuloFind {
+		
+		public static T singleton<T>(bool required = true) where T : Component {
+			List<T> all = allWithComponent<T>();
+			
+			if(all.Count == 1) {
+				return all[0];
+			} else if(all.Count == 0) {
+				if(required) {
+					throw new NotFoundException();
+				} else {
+					return null;
+				}
+			} else {
+				throw new MoreThanOneException();
+			}
+		}
+		
 		public static GameObject byName(string name, Component context = null) {
 			return byName<Transform>(name, context).gameObject;
 		}
@@ -234,5 +251,13 @@ namespace JuloUtil {
 		private static GameObject[] sceneRootObjects() {
 			return SceneManager.GetActiveScene().GetRootGameObjects();
 		}
+	}
+	
+	public class NotFoundException : Exception {
+		
+	}
+	
+	public class MoreThanOneException : Exception {
+		
 	}
 }
