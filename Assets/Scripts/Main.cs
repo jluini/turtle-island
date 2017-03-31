@@ -18,7 +18,10 @@ public class Main : MonoBehaviour {
 	VolumeItem musicButton;
 	VolumeItem soundsButton;
 	GameObject continueButton;
-	SwitchItem fullscreenButton;
+	//SwitchItem fullscreenButton;
+	
+	bool waitingToOpenMenu = false;
+	float gameOverTimestamp;
 	
 	void Start () {
 		machine = new StateMachine<State>(State.INIT);
@@ -40,10 +43,9 @@ public class Main : MonoBehaviour {
 		
 		continueButton = JuloFind.byName("ContinueButton", menuSystem);
 		
-		fullscreenButton = JuloFind.byName<SwitchItem>("FullscreenButton", menuSystem);
+		//fullscreenButton = JuloFind.byName<SwitchItem>("FullscreenButton", menuSystem);
 		
 		menuSystem.start(inputManager);
-		
 	}
 	
 	void Update () {
@@ -53,9 +55,9 @@ public class Main : MonoBehaviour {
 		if(inputManager.isDownKey("s")) {
 			soundsButton.click(menuSystem);
 		}
-		if(inputManager.isDownKey("f11")) {
-			fullscreenButton.click(menuSystem);
-		}
+		//if(inputManager.isDownKey("f11")) {
+		//	fullscreenButton.click(menuSystem);
+		//}
 		if(inputManager.isDownKey("f3")) {
 			nextLanguage();
 		}
@@ -77,15 +79,26 @@ public class Main : MonoBehaviour {
 		} else if(machine.state == State.GAME) {
 			if(inputManager.isDownAny("Start") || inputManager.isDownAny("Back")) {
 				pause();
+			} else if(!environment.isPlaying()) {
+				if(waitingToOpenMenu) {
+					float overEllapsed = JuloTime.applicationTimeSince(gameOverTimestamp);
+					if(overEllapsed >= environment.options.autoMenuTime) {
+						pause();
+					}
+				} else {
+					waitingToOpenMenu = true;
+					gameOverTimestamp = JuloTime.applicationTime();
+				}
 			} else {
 				environment.update();
-			}			
+			}
 		} else {
 			throw new System.ApplicationException("Unknown state");
 		}
 	}
 	
 	public void play() {
+		waitingToOpenMenu = false;
 		resume();
 		environment.play();
 	}
@@ -96,23 +109,24 @@ public class Main : MonoBehaviour {
 	public void playCpuMaximum() { playCpu(TurtleIsland.TurtleIsland.Maximum); }
 	
 	public void playCpu(int difficulty) {
+		waitingToOpenMenu = false;
 		resume();
 		environment.playCpu(difficulty);
 	}
 	
 	public void pause() {
+		waitingToOpenMenu = false;
+		
 		if(machine.state != State.GAME) {
 			Debug.Log("Invalid call of pause()");
 			return;
 		}
 		
-		if(environment.isPlaying()) {
-			JuloTime.stopGame();
-		}
-		
 		int index;
 		
 		if(environment.isPlaying()) {
+			JuloTime.stopGame();
+			
 			index = 0;
 			continueButton.SetActive(true);
 		} else {
