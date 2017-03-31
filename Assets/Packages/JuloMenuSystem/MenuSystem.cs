@@ -33,6 +33,8 @@ namespace JuloMenuSystem {
 		int currentItemIndex;
 		Item currentItem;
 		
+		float dpl = 10000f;
+		
 		class MenuEntry {
 			public int menuIndex;
 			public int itemIndex;
@@ -64,6 +66,9 @@ namespace JuloMenuSystem {
 			}
 			
 			navigation = new Stack<MenuEntry>();
+			
+			Vector3 pos = transform.position;
+			transform.position = new Vector3(pos.x, pos.y + dpl, pos.z);
 		}
 		
 		public void open() {
@@ -95,7 +100,9 @@ namespace JuloMenuSystem {
 			currentItemIndex = optionIndex;
 			currentItem = currentMenu.items[currentItemIndex];
 			
-			overlay.SetActive(true);
+			//overlay.SetActive(true);
+			Vector3 pos = transform.position;
+			transform.position = new Vector3(pos.x, pos.y - dpl, pos.z);
 			
 			currentMenu.show();
 			currentItem.select();
@@ -103,7 +110,9 @@ namespace JuloMenuSystem {
 		}
 		
 		public void close() {
-			overlay.SetActive(false);
+			//overlay.SetActive(false);
+			Vector3 pos = transform.position;
+			transform.position = new Vector3(pos.x, pos.y + dpl, pos.z);
 			cursor.hide();
 			
 			currentItem.deselect();

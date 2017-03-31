@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+﻿using UnityEngine.UI;
 
 using JuloUtil;
 using JuloMenuSystem;
@@ -23,6 +24,9 @@ public class Main : MonoBehaviour {
 	bool waitingToOpenMenu = false;
 	float gameOverTimestamp;
 	
+	Animator title;
+	Text authors;
+	
 	void Start () {
 		machine = new StateMachine<State>(State.INIT);
 		
@@ -46,6 +50,9 @@ public class Main : MonoBehaviour {
 		//fullscreenButton = JuloFind.byName<SwitchItem>("FullscreenButton", menuSystem);
 		
 		menuSystem.start(inputManager);
+		
+		title = JuloFind.byName<Animator>("Title");
+		authors = JuloFind.byName<Text>("Authors");
 	}
 	
 	void Update () {
@@ -97,9 +104,15 @@ public class Main : MonoBehaviour {
 		}
 	}
 	
-	public void play() {
+	void beforePlay() {
+		title.SetTrigger("quiet");
+		authors.color = new Color(0.631f, 0.616f, 0.533f, 0.110f);
+		
 		waitingToOpenMenu = false;
 		resume();
+	}
+	public void play() {
+		beforePlay();
 		environment.play();
 	}
 	
@@ -109,8 +122,7 @@ public class Main : MonoBehaviour {
 	public void playCpuMaximum() { playCpu(TurtleIsland.TurtleIsland.Maximum); }
 	
 	public void playCpu(int difficulty) {
-		waitingToOpenMenu = false;
-		resume();
+		beforePlay();
 		environment.playCpu(difficulty);
 	}
 	

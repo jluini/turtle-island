@@ -57,6 +57,9 @@ namespace TurtleIsland {
 			hk.cam.target = this;
 			
 			loadWeapons();
+			
+			hk.teamDisplays[TurtleIsland.LeftTeamId].setTeamName("");
+			hk.teamDisplays[TurtleIsland.RightTeamId].setTeamName("");
 		}
 		
 		public void update() {
