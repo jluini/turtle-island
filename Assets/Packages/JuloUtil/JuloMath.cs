@@ -143,37 +143,5 @@ namespace JuloUtil {
 				return new String(ret);
 			}
 		}
-			/*
-			int strLen = str.Length;
-			int dotPosition = strLen - decimals;
-			
-			string ret = "";
-			
-			if(str[0] == '-') {
-				ret += "-";
-				str = str.Substring(1);
-			}
-				
-			if(dotPosition <= 0) {
-				ret += "0.";
-				for(int j = 0; j < -dotPosition; j++) {
-					ret += "0";
-				}
-			}
-			
-			try {
-				for(int i = 0; i < strLen; i++) {
-					if(i > 0 && i == dotPosition) {
-						ret += ".";
-					}
-					ret += str[i];
-				}
-			} catch(IndexOutOfRangeException e) {
-				Debug.Log("Error para " + value +  "::" + decimals);
-				throw e;
-			}
-			
-			return ret;
-			*/
 	}
 }

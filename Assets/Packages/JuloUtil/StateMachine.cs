@@ -1,6 +1,4 @@
 
-//using UnityEngine;
-
 namespace JuloUtil {
 	
 	public class StateMachine<T> {
